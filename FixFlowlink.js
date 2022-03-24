@@ -22,7 +22,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 							   if (typeof refresh !== 'undefined'){
 								   if (Object.prototype.toString.call(refresh) == '[object Array]'){
 									   if (refresh[1] == "unimport"){
-										   myTable.deleteRow(refresh[0]);
+										   myTable.deleteRow(refresh[0].replace("unimportButton", ''));
 									   }
 								   }
 							   }
@@ -57,6 +57,17 @@ if (window.location.href.toLowerCase().includes("microserve")){
 			removeCellsList.push(i);
 		}
 	}
+	$('a[name="Remove"]').click(function()
+	{
+	    CallJSONMethod(
+	    'Incoming',
+	    'UnImportShiplink',
+	    {
+		shiplinkId: $(this).attr('ShiplinkId')
+	    }, 
+	    [$(this).attr('id'), 'unimport']);
+
+	});
 	$('#import').click(function()
 	{
 		  $.ajax({url: '/Flowlink/Burnaby/Ajax/AjaxGateway.php',
