@@ -8,12 +8,17 @@ if (window.location.href.toLowerCase().includes("microserve")){
 	document.body.style.backgroundColor = 'rgb(212, 245, 255)';
 	document.getElementById("import").outerHTML = document.getElementById("import").outerHTML;
 	myTable = document.querySelectorAll("tbody")[0];
+	removeCellsList = [];
 	for (var i = 1, row; row = myTable.rows[i]; i++) {
 		currValue = row.cells[0].innerHTML;
 		for (var j = 0; j < row.cells.length-1; j++) {
 			col = row.cells[j];
 			col.outerHTML = `<td class="Highlight" onclick="window.open('http://shiplink.microserve.ca/Flowlink/Burnaby//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + currValue + `','_blank')">` + col.innerHTML + `</td>`;
-	   }  
+		}
+		if (row.querySelectorAll("[name=Remove]").length > 0){
+			row.cells[row.cells.length-1].innerHTML = `<a name="Remove" shiplinkid="` + currValue + `" id="unimportButton` + removeCellsList.length + `" href="#">Remove</a>`;
+			removeCellsList.push(row);
+		}
 	}
 	$('#import').click(function()
 	{
