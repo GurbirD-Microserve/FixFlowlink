@@ -4,6 +4,43 @@ if (window.location.href.toLowerCase().includes("microserve")){
 	if (document.querySelectorAll("tbody").length == 0){ //Change condition
 		window.location.reload();
 	}
+	CallJSONMethod = function (screen, method, params, refresh, url){
+		$.getJSON('/Flowlink/Burnaby/Ajax/AjaxGateway.php?Screen=' + screen + '&Action=' + method,
+		params,
+		function(data){
+			  if (data.Result == 'OK')
+			  {                      
+				  $('#Dialog').html(data.Message);
+				  $('#Dialog').dialog(
+						'option', 
+						'buttons', 
+						{ 
+							'OK': function()
+							{
+							   document.body.style.cursor='auto';
+							   $('#Dialog').dialog('close');
+							   if (typeof refresh !== 'undefined'){
+								   if (Object.prototype.toString.call(refresh) == '[object Array]'){
+									   if (refresh[1] == "unimport"){
+										   myTable.deleteRow(refresh[0]);
+									   }
+								   }
+							   }
+							}
+						}
+				  );
+				  $('#Dialog').dialog('open');
+			  }
+			  else if (data.Result == "Fail")
+			  {
+					  alert(data.Message);
+			  }
+			  else if (data.Result == 'FatalError')
+			  {                  
+				  DisplayError(data.Message, data.File, data.Line, data.Trace);
+			  }             
+		});
+	};
 	if (document.body.style.backgroundColor != 'rgb(212, 245, 255)'){
 	document.body.style.backgroundColor = 'rgb(212, 245, 255)';
 	document.getElementById("import").outerHTML = document.getElementById("import").outerHTML;
@@ -17,7 +54,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 		}
 		if (row.querySelectorAll("[name=Remove]").length > 0){
 			row.cells[row.cells.length-1].innerHTML = `<a name="Remove" shiplinkid="` + currValue + `" id="unimportButton` + removeCellsList.length + `" href="#">Remove</a>`;
-			removeCellsList.push(row);
+			removeCellsList.push(i);
 		}
 	}
 	$('#import').click(function()
