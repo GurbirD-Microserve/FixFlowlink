@@ -23,7 +23,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 							   if (typeof refresh !== 'undefined'){
 								   if (Object.prototype.toString.call(refresh) == '[object Array]'){
 									   if (refresh[1] == "unimport"){
-										   myTable.deleteRow(refresh[0].replace("unimportButton", ''));
+										   myTable.deleteRow(removeCellsList[refresh[0].replace("unimportButton", '')]);
 									   }
 								   }
 							   }
@@ -54,7 +54,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 			col.outerHTML = `<td class="Highlight" onclick="window.open('http://shiplink.microserve.ca/Flowlink/Burnaby//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + currValue + `','_blank')">` + col.innerHTML + `</td>`;
 		}
 		if (row.querySelectorAll("[name=Remove]").length > 0){
-			row.cells[row.cells.length-1].innerHTML = `<a name="Remove" shiplinkid="` + currValue + `" id="unimportButton` + removeCellsList.length + `" href="#">Remove</a>`;
+			row.cells[row.cells.length-1].innerHTML = `<a name="Remove" shiplinkid="` + currValue + `" id="unimportButton` + removeCellsList.length + `" href="#" onclick="return false;">Remove</a>`;
 			removeCellsList.push(i);
 		}
 	}
