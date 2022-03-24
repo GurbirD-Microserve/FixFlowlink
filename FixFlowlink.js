@@ -10,7 +10,8 @@ if (window.location.href.toLowerCase().includes("microserve")){
 	myTable = document.querySelectorAll("tbody")[0];
 	for (var i = 1, row; row = myTable.rows[i]; i++) {
 		currValue = row.cells[0].innerHTML;
-		for (var j = 0, col; col = row.cells[j]; j++) {
+		for (var j = 0; j < row.cells.length-1; j++) {
+			col = row.cells[j];
 			col.outerHTML = `<td class="Highlight" onclick="window.open('http://shiplink.microserve.ca/Flowlink/Burnaby//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + currValue + `','_blank')">` + col.innerHTML + `</td>`;
 	   }  
 	}
