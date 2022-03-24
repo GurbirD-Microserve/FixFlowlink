@@ -4,6 +4,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 	if (document.querySelectorAll("tbody").length == 0 && document.getElementById("MainContent").innerHTML.toLowerCase().includes("execution time")){
 		window.location.reload();
 	}
+	else{
 	CallJSONMethod = function (screen, method, params, refresh, url){
 		$.getJSON('/Flowlink/Burnaby/Ajax/AjaxGateway.php?Screen=' + screen + '&Action=' + method,
 		params,
@@ -97,6 +98,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 			   });
 	}
 	);
+	}
 	}
 	}
 	
