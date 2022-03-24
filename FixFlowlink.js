@@ -1,7 +1,7 @@
 if (window.location.href.toLowerCase().includes("microserve")){
 	
 	if (window.location.search == "?Screen=Incoming"){
-	if (document.querySelectorAll("tbody").length == 0){ //Change condition
+	if (document.querySelectorAll("tbody").length == 0 && document.getElementById("MainContent").innerHTML.toLowerCase().includes("execution time")){
 		window.location.reload();
 	}
 	CallJSONMethod = function (screen, method, params, refresh, url){
