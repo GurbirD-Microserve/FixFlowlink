@@ -1,6 +1,9 @@
-javascript: (() => {
+if (window.location.href.toLowerCase().includes("microserve")){
 	
 	if (window.location.search == "?Screen=Incoming"){
+	if (document.querySelectorAll("tbody").length == 0){ //Change condition
+		window.location.reload();
+	}
 	if (document.body.style.backgroundColor != 'rgb(212, 245, 255)'){
 	document.body.style.backgroundColor = 'rgb(212, 245, 255)';
 	document.getElementById("import").outerHTML = document.getElementById("import").outerHTML;
@@ -999,4 +1002,4 @@ javascript: (() => {
 	}
 	}
 	
-})();
+}
