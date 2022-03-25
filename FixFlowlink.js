@@ -177,6 +177,67 @@ if (window.location.href.toLowerCase().includes("microserve")){
 			}
 		);
 	};
+	checkNewSerial = function(type){
+		if (type == 'Product')
+		{
+		    CallJSONMethod('Incoming','CreateNewItem', $('#AssetForm').serialize(),[0,"refresh"])
+		    return;
+		}
+		    $.getJSON('/Flowlink/Burnaby/Ajax/AjaxGateway.php?Screen=Incoming&Action=CheckSerial',
+			{
+			    Serial: $('#AssetForm').find('input[name="Serial"]').val()                   
+			},
+			function(data)
+			{
+			   switch (data.Result)
+			   {
+			   case 'FatalError':
+
+			       DisplayError(data.Message, data.File, data.Line, data.Trace);
+			       return;
+			   break;
+			   case "Local Asset":
+
+				 $('#Dialog') 
+				    .html('This asset already exists and is in the warehouse.<br/>' + 
+					  'It is located at: ' + data.Location)
+				    .dialog('option','buttons',{'OK': function(){$('#Dialog').dialog('close')}})
+				    .dialog('open');
+			   break;
+			   case "Found Asset":
+
+				$('#Dialog')
+				    .html(
+					'<div style="font-size: larger; font-weight: bold">This asset already exists as:</div>' +
+					'<div><span style="font-weight: bold; width: 10em;">Type:</span><span style="padding-left: 1em;" >' + data.Type + '</span></div>' +
+					'Make:' + data.Make + '<br/>' +
+					'Model:' + data.Model + '<br/>' +
+					'Serial:' + data.Serial + '<br/>' +
+					'Asset Tag:' + data.Tag + '<br/>' +
+					'Is this the <b>exact same</b> asset?');
+
+				    $('#Dialog').dialog('option','buttons', 
+				    {
+					'Yes': function()
+					 {
+					     $('#Dialog').dialog('close');
+					     CallJSONMethod('Incoming','ProcessNewReturn',{ assetId: data.Id, shiplinkId: $('#ShiplinkId').val()});
+					 },
+					 'No': function() 
+					 {
+					     $('#Dialog').dialog('close');
+					     return;
+					 }
+				    });
+
+				    $('#Dialog').dialog('open');
+			    break;
+			    default:                    
+				CallJSONMethod('Incoming','CreateNewItem', $('#AssetForm').serialize(),[0,"refresh"]);
+			   }
+
+		    }
+	)};
 	var callingBulkRN = false;
 	var deleting40A2srn = false;
 	
