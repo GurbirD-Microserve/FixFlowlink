@@ -221,7 +221,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 					'Yes': function()
 					 {
 					     $('#Dialog').dialog('close');
-					     CallJSONMethod('Incoming','ProcessNewReturn',{ assetId: data.Id, shiplinkId: $('#ShiplinkId').val()});
+					     CallJSONMethod('Incoming','ProcessNewReturn',{ assetId: data.Id, shiplinkId: $('#ShiplinkId').val()},[0,"refresh"]);
 					 },
 					 'No': function() 
 					 {
