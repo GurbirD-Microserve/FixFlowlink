@@ -502,6 +502,18 @@ if (window.location.href.toLowerCase().includes("microserve")){
 		var encodedUri = encodeURI(csvContent);
 		window.open(encodedUri);
 	};
+		
+	document.getElementById("Confirm").outerHTML = document.getElementById("Confirm").outerHTML;
+	$('#Confirm').click(function(){
+		CallJSONMethod('Incoming','ConfirmShiplink', {ShiplinkID: $('#ShiplinkId').val()}, [0,"refresh"]);
+	});
+	for (let i = 0; i < document.querySelectorAll("[name-Delete]").length; i++){
+		document.querySelectorAll("[name-Delete]")[i].outerHTML = document.querySelectorAll("[name-Delete]")[i].outerHTML;
+	}
+	$('input[name=Delete]').click(function(){
+		var tableID = $(this).parents('.ItemProperties').children('input[name="tableID"]').val();    
+		CallJSONMethod('Incoming','DeleteItem', {TableId: tableID}, [0,"refresh"]);
+	});
 	
 	if (notReceived.length > 0){ 
 		allPeripherals = document.getElementsByName("Peripheral");
@@ -1099,14 +1111,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 				CallJSONMethodNODIALOG('Incoming','DeleteSl', {RelationId: RelationId}, [form[0].querySelectorAll("[name=myItemID]")[0].value, "delete"]);
 			}
 		});
-		document.getElementById("Confirm").outerHTML = document.getElementById("Confirm").outerHTML;
-		$('#Confirm').click(function(){
-			CallJSONMethod('Incoming','ConfirmShiplink', {ShiplinkID: $('#ShiplinkId').val()}, [0,"refresh"]);
-		});
-		$('input[name=Delete]').click(function(){
-			var tableID = $(this).parents('.ItemProperties').children('input[name="tableID"]').val();    
-			CallJSONMethod('Incoming','DeleteItem', {TableId: tableID}, [0,"refresh"]);
-		});
+		
 		
 		document.getElementById("ListDevices").addEventListener("click", openListWindow);
 		document.getElementById("BulkReceive").addEventListener("click", openBulkWindow);
