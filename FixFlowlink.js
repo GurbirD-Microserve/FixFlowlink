@@ -528,25 +528,6 @@ if (window.location.href.toLowerCase().includes("microserve")){
 	});
 	
 	if (notReceived.length > 0){ 
-		for (let i = 0; i < allItems.length; i++){
-		if (allItems[i].querySelectorAll("[name=Create]").length > 0){
-			allItems[i].querySelectorAll("[name=Create]")[0].outerHTML = allItems[i].querySelectorAll("[name=Create]")[0].outerHTML;
-			allItems[i].querySelectorAll("[name=Create]")[0].id = "CreateButton" + i;
-		}
-		if (allItems[i].querySelectorAll("[name=DeleteSl]").length > 0){
-			allItems[i].querySelectorAll("[name=DeleteSl]")[0].outerHTML = allItems[i].querySelectorAll("[name=DeleteSl]")[0].outerHTML;
-			allItems[i].querySelectorAll("[name=DeleteSl]")[0].id = "DeleteButton" + i;
-		}
-		if (allItems[i].querySelectorAll("[name=Delete]").length > 0){
-			allItems[i].querySelectorAll("[name=Delete]")[0].outerHTML = allItems[i].querySelectorAll("[name=Delete]")[0].outerHTML;
-			allItems[i].querySelectorAll("[name=Delete]")[0].id = "ConfirmDelete" + i;
-		}
-		}
-		document.getElementById("Confirm").outerHTML = document.getElementById("Confirm").outerHTML;
-		$('#Confirm').click(function(){
-			CallJSONMethod('Incoming','ConfirmShiplink', {ShiplinkID: $('#ShiplinkId').val()}, [0,"refresh"]);
-		});
-
 		$('input[name=Delete]').click(function(){
 			var tableID = $(this).parents('.ItemProperties').children('input[name="tableID"]').val();    
 			CallJSONMethod('Incoming','DeleteItem', {TableId: tableID}, [0,"refresh"]);
@@ -1142,29 +1123,6 @@ if (window.location.href.toLowerCase().includes("microserve")){
 	else{
 		document.getElementById("AddMedia").insertAdjacentHTML('afterend', '<input type="button" value="List Devices" id="ListDevices">');
 		document.getElementById("ListDevices").addEventListener("click", openListWindow);
-		for (let i = 0; i < allItems.length; i++){
-		if (allItems[i].querySelectorAll("[name=Create]").length > 0){
-			allItems[i].querySelectorAll("[name=Create]")[0].outerHTML = allItems[i].querySelectorAll("[name=Create]")[0].outerHTML;
-			allItems[i].querySelectorAll("[name=Create]")[0].id = "CreateButton" + i;
-		}
-		if (allItems[i].querySelectorAll("[name=DeleteSl]").length > 0){
-			allItems[i].querySelectorAll("[name=DeleteSl]")[0].outerHTML = allItems[i].querySelectorAll("[name=DeleteSl]")[0].outerHTML;
-			allItems[i].querySelectorAll("[name=DeleteSl]")[0].id = "DeleteButton" + i;
-		}
-		if (allItems[i].querySelectorAll("[name=Delete]").length > 0){
-			allItems[i].querySelectorAll("[name=Delete]")[0].outerHTML = allItems[i].querySelectorAll("[name=Delete]")[0].outerHTML;
-			allItems[i].querySelectorAll("[name=Delete]")[0].id = "ConfirmDelete" + i;
-		}
-		}
-		document.getElementById("Confirm").outerHTML = document.getElementById("Confirm").outerHTML;
-		$('#Confirm').click(function(){
-			CallJSONMethod('Incoming','ConfirmShiplink', {ShiplinkID: $('#ShiplinkId').val()}, [0,"refresh"]);
-		});
-
-		$('input[name=Delete]').click(function(){
-			var tableID = $(this).parents('.ItemProperties').children('input[name="tableID"]').val();    
-			CallJSONMethod('Incoming','DeleteItem', {TableId: tableID}, [0,"refresh"]);
-		});
 	}
 	}
 	}
