@@ -502,14 +502,26 @@ if (window.location.href.toLowerCase().includes("microserve")){
 		var encodedUri = encodeURI(csvContent);
 		window.open(encodedUri);
 	};
-		
+	
+	for (let i = 0; i < allItems.length; i++){
+	if (allItems[i].querySelectorAll("[name=Create]").length > 0){
+		allItems[i].querySelectorAll("[name=Create]")[0].outerHTML = allItems[i].querySelectorAll("[name=Create]")[0].outerHTML;
+		allItems[i].querySelectorAll("[name=Create]")[0].id = "CreateButton" + i;
+	}
+	if (allItems[i].querySelectorAll("[name=DeleteSl]").length > 0){
+		allItems[i].querySelectorAll("[name=DeleteSl]")[0].outerHTML = allItems[i].querySelectorAll("[name=DeleteSl]")[0].outerHTML;
+		allItems[i].querySelectorAll("[name=DeleteSl]")[0].id = "DeleteButton" + i;
+	}
+	if (allItems[i].querySelectorAll("[name=Delete]").length > 0){
+		allItems[i].querySelectorAll("[name=Delete]")[0].outerHTML = allItems[i].querySelectorAll("[name=Delete]")[0].outerHTML;
+		allItems[i].querySelectorAll("[name=Delete]")[0].id = "ConfirmDelete" + i;
+	}
+	}
 	document.getElementById("Confirm").outerHTML = document.getElementById("Confirm").outerHTML;
 	$('#Confirm').click(function(){
 		CallJSONMethod('Incoming','ConfirmShiplink', {ShiplinkID: $('#ShiplinkId').val()}, [0,"refresh"]);
 	});
-	for (let i = 0; i < document.querySelectorAll("[name-Delete]").length; i++){
-		document.querySelectorAll("[name-Delete]")[i].outerHTML = document.querySelectorAll("[name-Delete]")[i].outerHTML;
-	}
+
 	$('input[name=Delete]').click(function(){
 		var tableID = $(this).parents('.ItemProperties').children('input[name="tableID"]').val();    
 		CallJSONMethod('Incoming','DeleteItem', {TableId: tableID}, [0,"refresh"]);
@@ -956,20 +968,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 			else{ alert("No 40A2s."); }
 		};
 		
-		for (let i = 0; i < allItems.length; i++){
-			if (allItems[i].querySelectorAll("[name=Create]").length > 0){
-				allItems[i].querySelectorAll("[name=Create]")[0].outerHTML = allItems[i].querySelectorAll("[name=Create]")[0].outerHTML;
-				allItems[i].querySelectorAll("[name=Create]")[0].id = "CreateButton" + i;
-			}
-			if (allItems[i].querySelectorAll("[name=DeleteSl]").length > 0){
-				allItems[i].querySelectorAll("[name=DeleteSl]")[0].outerHTML = allItems[i].querySelectorAll("[name=DeleteSl]")[0].outerHTML;
-				allItems[i].querySelectorAll("[name=DeleteSl]")[0].id = "DeleteButton" + i;
-			}
-			if (allItems[i].querySelectorAll("[name=Delete]").length > 0){
-				allItems[i].querySelectorAll("[name=Delete]")[0].outerHTML = allItems[i].querySelectorAll("[name=Delete]")[0].outerHTML;
-				allItems[i].querySelectorAll("[name=Delete]")[0].id = "ConfirmDelete" + i;
-			}
-		}
+		
 		checkSerialNODIALOG = function (form){
 			if (form[0].Serial == undefined){
 				  CallJSONMethodNODIALOG('Incoming','CreateAsset', form.serialize(), [form[0].querySelectorAll("[name=myItemID]")[0].value, "purple"]);  
