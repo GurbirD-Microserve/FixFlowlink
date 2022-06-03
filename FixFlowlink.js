@@ -261,6 +261,13 @@ if (window.location.href.toLowerCase().includes("microserve")){
 			document.getElementsByName("OldType")[i].innerText = "Docking Station";
 		}
 	}
+	for (let i = 0; i < allItems.length; i++){
+		if (allItems[i].querySelectorAll("[name=Type]").length > 0){
+			if (allItems[i].querySelectorAll("[name=Type]")[0].value == 'Docking Station'){
+                    		allItems[i].querySelectorAll("[class=Property]")[allItems[i].querySelectorAll("[class=Property]").length-1].outerHTML = '';
+                	}
+		}
+	}
 	document.getElementById("TypeFilter").outerHTML = document.getElementById("TypeFilter").outerHTML;
 	typeFilter = document.getElementById("TypeFilter");
 	typeFilter.value = "None";
