@@ -256,6 +256,11 @@ if (window.location.href.toLowerCase().includes("microserve")){
 			document.getElementsByName("OldAssetTag")[i].innerText = "N/A";
 		}
 	}
+	for (let i = 0; i < document.getElementsByName("OldType").length; i++){
+		if (document.getElementsByName("OldType")[i].innerText == 'Tracked Docking Station'){
+			document.getElementsByName("OldType")[i].innerText = "Docking Station";
+		}
+	}
 	document.getElementById("TypeFilter").outerHTML = document.getElementById("TypeFilter").outerHTML;
 	typeFilter = document.getElementById("TypeFilter");
 	typeFilter.value = "None";
