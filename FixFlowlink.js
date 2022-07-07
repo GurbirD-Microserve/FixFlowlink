@@ -918,6 +918,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 			if (allItems[itemIndex].querySelectorAll("[name=Make]")[0].value == '1.UNDEFINED'){
 				allItems[itemIndex].querySelectorAll("[name=Make]")[0].value = guessMakeUnknown(itemIndex);
 			}
+			allItems[itemIndex].querySelectorAll("[name=Make]")[0].dispatchEvent(e);
 			if (allItems[itemIndex].querySelectorAll("[name=Make]")[0].value != '1.UNDEFINED'){
 				allItems[itemIndex].querySelectorAll("[name=Model]")[0].value = guessModel(itemIndex);
 			}
