@@ -4,6 +4,22 @@ if (window.location.href.toLowerCase().includes("microserve")){
 		document.getElementById("Confirm").innerHTML = '<a id="Confirmlink" href="/Index.php?cmd=shiplink&amp;action=Receive&amp;confirm=true&amp;id=' + document.getElementsByClassName("PropertyValue")[0].innerText + '&amp;boxes=' + document.getElementsByClassName("PropertyValue")[6].innerText + '">Confirm</a>';
 	}
 	
+	if (window.location.search == "?Screen=Quarantine"){
+	    if (document.body.style.backgroundColor != 'rgb(254, 254, 254)'){ 
+		document.body.style.backgroundColor = 'rgb(254, 254, 254)';
+		$('input[name="Edit"]').each(function()
+		{
+		    id = $(this).attr('binId');
+		    $(this).before('<input type="button" value="New Tab" binid="' + id + '" name="NewTab">');
+		})
+		$('input[name="NewTab"]').click(function()
+		{
+		    id = $(this).attr('binId');
+		    window.open('http://shiplink.microserve.ca/Flowlink/Burnaby//Index.php?Screen=Bins&Action=Edit&id=' + id, '_blank').focus();
+		})
+	    }
+	}
+	
 	if (window.location.search == "?Screen=Incoming"){
 	if (document.querySelectorAll("tbody").length == 0 && document.getElementById("MainContent").innerHTML.toLowerCase().includes("execution time")){
 		window.location.reload();
