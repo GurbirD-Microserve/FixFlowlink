@@ -1,7 +1,89 @@
 if (window.location.href.toLowerCase().includes("microserve")){
 	
 	if (window.location.search.includes("?cmd=shiplink&action=Receive&id=")){
-		document.getElementById("Confirm").innerHTML = '<a id="Confirmlink" href="/Index.php?cmd=shiplink&amp;action=Receive&amp;confirm=true&amp;id=' + document.getElementsByClassName("PropertyValue")[0].innerText + '&amp;boxes=' + document.getElementsByClassName("PropertyValue")[6].innerText + '">Confirm</a>';
+		if (document.body.style.backgroundColor != 'rgb(254, 254, 254)'){ 
+			document.body.style.backgroundColor = 'rgb(254, 254, 254)';
+			document.getElementById("mainLayout").insertAdjacentHTML("afterend", `<div id="OuterBulkSLWindowDiv" style="position: absolute; display: none; top: 0px;"></div>`);
+
+			shiplinkRcvFunction = function(){
+				slsTextBox = document.getElementById("SLPastingBox");
+				boxesTextBox = document.getElementById("BoxNumberPastingBox");
+				if (typeof slsTextBox === "undefined" || typeof boxesTextBox === "undefined"){
+					alert("Something went wrong. Try again.");
+				}
+				else{
+					tempBulkSLList = slsTextBox.value.replace(/^\n|\n$/g, '').split("\n");
+					convertedSLsText = [];
+					for (let i  = 0; i < tempBulkSLList.length; i++){
+						tempBulkSLList[i] = tempBulkSLList[i].replace("-", "").replace("o", "0").replace("O", "0").toUpperCase();
+						if (tempBulkSLList[i].trim('') != ''){ convertedSLsText.push(tempBulkSLList[i].trim('')); }
+					}
+					tempBulkSLList = [];
+					tempBulkSLList = boxesTextBox.value.replace(/^\n|\n$/g, '').split("\n");
+					convertedBoxesText = [];
+					for (let i  = 0; i < tempBulkSLList.length; i++){
+						if (tempBulkSLList[i].trim('') != ''){ convertedBoxesText.push(tempBulkSLList[i].trim('')); }
+					}
+					if (convertedSLsText.length == convertedBoxesText.length){
+						for (let i = 0; i < convertedSLsText.length; i++){
+							window.open('https://shiplink.microserve.ca/Index.php?cmd=shiplink&action=Receive&confirm=true&id=' + convertedSLsText[i] + '&boxes=' + convertedBoxesText[i] + '&closereceive', '_blank').focus();
+						}
+						window.focus();
+					}
+					else{
+						alert("Amount of Shiplinks does not match amount of numbers. Please check again.");
+					}
+				}
+			};
+
+			openBulkSLWindow = function (){
+				backupBulkSLWindowHTML = `<div style="
+				  height: 100vh;
+				  width: 100vw;
+				  position: absolute;
+				  top: 0;
+				  left: 0;
+				  background-color: #0000002b;
+				  "><div style="
+				  height: 100vh;
+				  width: 100vw;
+				  position: absolute;
+				  top: 0;
+				  left: 0;
+				  display: none;
+				  " id="bulkSLControlsBlocker"></div>
+					<div id="ActualBulkSLWindow" style="
+					width: 75vw;
+					height: 75vh;
+					margin-top: 12vh;
+					margin-left: 12vw;
+					background-color: #ffffff;
+					padding: 0.5vw;
+					"><span class="Title">Receive Bulk Shipments</span><button style="float:right" class="Title" onclick="closeBulkSLWindow()">X</button><br><br><br><span style="margin-left: 12%;">Paste Shiplinks:</span><span style="float: right; margin-right: 40%;">Paste number of boxes:</span><br>
+				<textarea style="width:30%;margin-left: 10%;" rows="30" id="SLPastingBox" class=""></textarea><textarea style="width:30%;float: right; margin-right: 25%;" rows="30" id="BoxNumberPastingBox" class=""></textarea><br><br><br><br><button style="float:right" id="shiplinkRcvButton" onclick="shiplinkRcvFunction()">Receive All</button></div></div>`;
+				document.getElementById("OuterBulkSLWindowDiv").innerHTML = backupBulkSLWindowHTML;
+				document.getElementById("OuterBulkSLWindowDiv").style.display = "block";
+				window.scrollTo(0, 0);
+				document.body.style.overflowX = "hidden";
+				document.body.style.overflowY = "hidden";
+			};
+
+			closeBulkSLWindow = function(){
+				document.getElementById("OuterBulkSLWindowDiv").innerHTML = '';
+				document.getElementById("OuterBulkSLWindowDiv").style.display = "none";
+				document.body.style.overflowX = "scroll";
+				document.body.style.overflowY = "scroll";
+			};
+
+			document.getElementById("Confirm").innerHTML = '<a id="Confirmlink" href="/Index.php?cmd=shiplink&amp;action=Receive&amp;confirm=true&amp;id=' + document.getElementsByClassName("PropertyValue")[0].innerText + '&amp;boxes=' + document.getElementsByClassName("PropertyValue")[6].innerText + '">Confirm</a>';
+
+			document.getElementsByClassName("SubMenu")[0].querySelectorAll("a")[0].insertAdjacentHTML("afterend", '&nbsp;<a href="javascript:void(0);" id="BulkSLReceive">Bulk</a>');
+			document.getElementById("BulkSLReceive").addEventListener("click", openBulkSLWindow);
+		}
+	}
+	
+	if (window.location.search.includes("?cmd=shiplink&action=Receive&confirm=true&id=") && window.location.search.includes("&closereceive")){
+	    window.close();
 	}
 	
 	if (window.location.search == "?Screen=Quarantine"){
