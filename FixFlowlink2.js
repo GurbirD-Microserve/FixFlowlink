@@ -127,9 +127,10 @@ if (window.location.href.toLowerCase().includes("microserve")){
 							   if (typeof refresh !== 'undefined'){
 								   if (Object.prototype.toString.call(refresh) == '[object Array]'){
 									   if (refresh[1] == "unimport"){
-										   myTable.deleteRow(removeCellsList[refresh[0].replace("unimportButton", '')]);
+										   myTable.deleteRow(allShiplinksList.indexOf(refresh[0]));
+										   allShiplinksList.splice(allShiplinksList.indexOf(refresh[0], 1));
 									   }
-								   }
+								}
 							   }
 							}
 						}
@@ -150,7 +151,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 	document.body.style.backgroundColor = 'rgb(212, 245, 255)';
 	document.getElementById("import").outerHTML = document.getElementById("import").outerHTML;
 	myTable = document.querySelectorAll("tbody")[0];
-	removeCellsList = [];
+	allShiplinksList = ['']; //removeCellsList = [];
 	for (var i = 1, row; row = myTable.rows[i]; i++) {
 		currValue = row.cells[0].innerHTML;
 		for (var j = 0; j < row.cells.length-1; j++) {
@@ -158,21 +159,130 @@ if (window.location.href.toLowerCase().includes("microserve")){
 			col.outerHTML = `<td class="Highlight" onclick="window.open('http://shiplink.microserve.ca/Flowlink/Burnaby//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + currValue + `','_blank')">` + col.innerHTML + `</td>`;
 		}
 		if (row.querySelectorAll("[name=Remove]").length > 0){
-			row.cells[row.cells.length-1].innerHTML = `<a name="Remove" shiplinkid="` + currValue + `" id="unimportButton` + removeCellsList.length + `" href="#" onclick="return false;">Remove</a>`;
+			row.cells[row.cells.length-1].innerHTML = `<a name="Remove" shiplinkid="` + currValue + `" id="unimportButton` + currValue + `" href="#" onclick="return false;">Remove</a>`;
 			removeCellsList.push(i);
 		}
+		allShiplinksList.push(currValue);
 	}
 	$('a[name="Remove"]').click(function()
 	{
-	    CallJSONMethod(
-	    'Incoming',
-	    'UnImportShiplink',
-	    {
+		CallJSONMethod(
+		'Incoming',
+		'UnImportShiplink',
+		{
 		shiplinkId: $(this).attr('ShiplinkId')
-	    }, 
-	    [$(this).attr('id'), 'unimport']);
-
+		}, 
+		[($(this).attr('id')).replace("unimportButton", ''), 'unimport']);
 	});
+	document.getElementById("Main").insertAdjacentHTML("afterend", `<div id="OuterOptionsWindowDiv" style="position: absolute; display: none; top: 0px;"></div>`);
+
+	showHideButtons = false;
+
+	tryRemove = function (){
+		slToRemove = document.getElementById("tryRmv").value;
+		if (allShiplinksList.indexOf(slToRemove) == -1 || slToRemove == ''){
+			alert('Shiplink not listed');
+		}
+		else{
+			CallJSONMethod(
+		    'Incoming',
+		    'UnImportShiplink',
+		    {
+			shiplinkId: slToRemove
+		    }, 
+		    [slToRemove, 'unimport']);
+		}
+	}
+
+	bulkImport = function (){
+		impTextBox = document.getElementById("blkImp");
+		if (typeof impTextBox === "undefined"){
+			alert("Something went wrong. Try again.");
+		}
+		else{
+			tempImpSLList = impTextBox.value.replace(/^\n|\n$/g, '').split("\n");
+			convertedImpText = [];
+			// errorImpText = 'Could not import:\n';
+			for (let i  = 0; i < tempImpSLList.length; i++){
+				tempImpSLList[i] = tempImpSLList[i].replace("-", "").replace("o", "0").replace("O", "0").toUpperCase();
+				if (tempImpSLList[i].trim('') != ''){ convertedImpText.push(tempImpSLList[i].trim('')); }
+			}
+			for (let i = 0; i < convertedImpText.length; i++){
+				$.ajax({url: '/Flowlink/Burnaby/Ajax/AjaxGateway.php',
+				data: 
+				{
+					Screen: 'Incoming',
+					Action: 'ImportShiplink',
+					shiplink: convertedImpText[i]
+				},
+				success: function(data)
+				{
+					var result = $.trim(data);
+					if (result == "Done!"){
+						myTable = document.querySelectorAll("tbody");
+						myTable = myTable[0];
+						var newRow = myTable.insertRow(-1);
+						newRow.outerHTML = `<tr class="Highlight"><td class="Highlight" onclick="window.open('http://shiplink.microserve.ca/Flowlink/Burnaby//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + convertedImpText[i] + `','_blank')">` + convertedImpText[i] + `</td><td class="Highlight" onclick=" window.open('http://shiplink.microserve.ca/Flowlink/Burnaby//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + convertedImpText[i] + `','_blank')"></td><td class="Highlight" onclick=" window.open('http://shiplink.microserve.ca/Flowlink/Burnaby//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + convertedImpText[i] + `','_blank')"></td><td class="Highlight" onclick=" window.open('http://shiplink.microserve.ca/Flowlink/Burnaby//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + convertedImpText[i] + `','_blank')"></td><td class="Highlight" onclick=" window.open('http://shiplink.microserve.ca/Flowlink/Burnaby//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + convertedImpText[i] + `','_blank')"></td><td class="Highlight" onclick=" window.open('http://shiplink.microserve.ca/Flowlink/Burnaby//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + convertedImpText[i] + `','_blank')"></td><td class="Highlight" onclick=" window.open('http://shiplink.microserve.ca/Flowlink/Burnaby//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + convertedImpText[i] + `','_blank')"></td><td class="Highlight" onclick=" window.open('http://shiplink.microserve.ca/Flowlink/Burnaby//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + convertedImpText[i] + `','_blank')"></td></tr>`;
+					}
+					else{
+						alert(result);
+					}
+				}
+			   });
+			}
+			document.getElementById("blkImp").value = '';
+		}
+	}
+
+	changeHides = function (){
+
+	}
+
+	openOptionsWindow = function (){
+		backupOptionsWindowHTML = `<div style="
+		  height: 100vh;
+		  width: 100vw;
+		  position: absolute;
+		  top: 0;
+		  left: 0;
+		  background-color: #0000002b;
+		  "><div style="
+		  height: 100vh;
+		  width: 100vw;
+		  position: absolute;
+		  top: 0;
+		  left: 0;
+		  display: none;
+		  " id="OptionsControlsBlocker"></div>
+			<div id="ActualOptionsWindow" style="
+			width: 75vw;
+			height: 75vh;
+			margin-top: 12vh;
+			margin-left: 12vw;
+			background-color: #ffffff;
+			padding: 0.5vw;
+			"><span class="Title">Advanced Options</span><button style="float:right" class="Title" onclick="closeOptionsWindow()">X</button><br><br><br><br><br><span style="margin-left: 12%;">Attempt Shiplink Remove:     <input type="text" id="tryRmv" name="tryRmv"><button style="" onclick="tryRemove()">Try</button></span><br>
+			<br><br><span style="margin-left: 12%;">Bulk Import:     <textarea name="blkImp" id="blkImp" rows="10"></textarea><button style="" onclick="bulkImport()">Go</button></span><br><br><br><br><span style="margin-left: 12%;"><label for="showHide">Show Hide buttons</label><input type="checkbox" id="showHide" name="Show Hide buttons" onclick="changeHides()"></span></div></div>`;
+		document.getElementById("OuterOptionsWindowDiv").innerHTML = backupOptionsWindowHTML;
+		document.getElementById("OuterOptionsWindowDiv").style.display = "block";
+		document.getElementById('OuterOptionsWindowDiv').style.setProperty("top", (document.body.scrollHeight - window.innerHeight) + 'px');
+		window.scrollTo(0, document.body.scrollHeight);
+		document.body.style.overflowX = "hidden";
+		document.body.style.overflowY = "hidden";
+		if (showHideButtons){document.getElementById("showHide").checked = true;}
+		else{document.getElementById("showHide").checked = false;}
+	};
+
+	closeOptionsWindow = function(){
+		document.getElementById("OuterOptionsWindowDiv").innerHTML = '';
+		document.getElementById("OuterOptionsWindowDiv").style.display = "none";
+		document.body.style.overflowX = "scroll";
+		document.body.style.overflowY = "scroll";
+		window.scrollTo(0, document.body.scrollHeight);
+	};
+
+	document.getElementById("Logout").insertAdjacentHTML("beforebegin", '<input type="button" class="cssButton" value="Advanced" id="Advanced">');
+	document.getElementById("Advanced").addEventListener("click", openOptionsWindow);
 	$('#import').click(function()
 	{
 		  $.ajax({url: '/Flowlink/Burnaby/Ajax/AjaxGateway.php',
