@@ -158,10 +158,6 @@ if (window.location.href.toLowerCase().includes("microserve")){
 			col = row.cells[j];
 			col.outerHTML = `<td class="Highlight" onclick="window.open('http://shiplink.microserve.ca/Flowlink/Burnaby//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + currValue + `','_blank')">` + col.innerHTML + `</td>`;
 		}
-		if (row.querySelectorAll("[name=Remove]").length > 0){
-			row.cells[row.cells.length-1].innerHTML = `<a name="Remove" shiplinkid="` + currValue + `" id="unimportButton` + currValue + `" href="#" onclick="return false;">Remove</a>`;
-			removeCellsList.push(i);
-		}
 		allShiplinksList.push(currValue);
 	}
 	$('a[name="Remove"]').click(function()
