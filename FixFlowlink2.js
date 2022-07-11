@@ -29,6 +29,8 @@ if (window.location.href.toLowerCase().includes("microserve")){
 							window.open('https://shiplink.microserve.ca/Index.php?cmd=shiplink&action=Receive&confirm=true&id=' + convertedSLsText[i] + '&boxes=' + convertedBoxesText[i] + '&closereceive', '_blank').focus();
 						}
 						window.focus();
+						doneBulkSLWindowHTML = `<span class="Title">Receive Bulk Shipments</span><button style="float:right" class="Title" onclick="closeBulkSLWindow()">X</button><br><br><br><span style="margin-left: 12%;">Done.</span>`;
+						document.getElementById("ActualBulkSLWindow").innerHTML = doneBulkSLWindowHTML;
 					}
 					else{
 						alert("Amount of Shiplinks does not match amount of numbers. Please check again.");
