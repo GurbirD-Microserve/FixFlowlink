@@ -350,7 +350,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 				}
 			}
 			else{
-				row.cells[0].insertAdjacentHTML("afterend", `&nbsp;&nbsp;&nbsp;&nbsp;<a name="Hide" shiplinkid="` + currValue + `" href="#" style="display: none;" onclick="return false;">Hide</a>`);
+				row.cells[0].insertAdjacentHTML("beforeend", `<a name="Hide" shiplinkid="` + currValue + `" href="#" style="display: none; float: right;" onclick="return false;">Hide&nbsp;&nbsp;&nbsp;&nbsp;</a>`);
 			}
 			allShiplinksList.push(currValue);
 		}
