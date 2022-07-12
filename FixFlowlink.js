@@ -231,6 +231,12 @@ if (window.location.href.toLowerCase().includes("microserve")){
 							$('a[name="Hide"]').click(function(){
 								deleteFromTable($(this).attr('ShiplinkId'));
 							});
+							if (showHideButtons){
+								allHides = document.getElementsByName("Hide");
+								for (var i = 0; i < allHides.length; i++){
+									allHides[i].style.display = 'Block';
+								}
+							}
 						}
 						else{
 							alert(result);
@@ -387,6 +393,12 @@ if (window.location.href.toLowerCase().includes("microserve")){
 						$('a[name="Hide"]').click(function(){
 							deleteFromTable($(this).attr('ShiplinkId'));
 						});
+						if (showHideButtons){
+							allHides = document.getElementsByName("Hide");
+							for (var i = 0; i < allHides.length; i++){
+								allHides[i].style.display = 'Block';
+							}
+						}
 					}
 					else{
 						alert(result);
