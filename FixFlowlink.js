@@ -209,11 +209,11 @@ if (window.location.href.toLowerCase().includes("microserve")){
 			else{
 				tempImpSLList = impTextBox.value.replace(/^\n|\n$/g, '').split("\n");
 				convertedImpText = [];
-				for (let i  = 0; i < tempImpSLList.length; i++){
+				for (var i  = 0; i < tempImpSLList.length; i++){
 					tempImpSLList[i] = tempImpSLList[i].replace("-", "").replace("o", "0").replace("O", "0").toUpperCase();
 					if (tempImpSLList[i].trim('') != ''){ convertedImpText.push(tempImpSLList[i].trim('')); }
 				}
-				for (let i = 0; i < convertedImpText.length; i++){
+				for (var i = 0; i < convertedImpText.length; i++){
 					$.ajax({url: '/Flowlink/Burnaby/Ajax/AjaxGateway.php',
 					data: 
 					{
@@ -233,8 +233,8 @@ if (window.location.href.toLowerCase().includes("microserve")){
 							});
 							if (showHideButtons){
 								allHides = document.getElementsByName("Hide");
-								for (var i = 0; i < allHides.length; i++){
-									allHides[i].style.display = 'Block';
+								for (var j = 0; j < allHides.length; j++){
+									allHides[j].style.display = 'Block';
 								}
 							}
 						}
