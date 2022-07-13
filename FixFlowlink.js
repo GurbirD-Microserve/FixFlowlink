@@ -287,7 +287,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 					window.open('http://shiplink.microserve.ca/Flowlink/Burnaby//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=' + convertedOpenText[i], '_blank').focus();
 				}
 				document.getElementById("blkOpen").value = '';
-				closeOptionsWindow;
+				closeOptionsWindow();
 			}
 		};
 
