@@ -95,12 +95,12 @@ if (window.location.href.toLowerCase().includes("microserve")){
 		{
 		    id = $(this).attr('binId');
 		    $(this).before('<input type="button" value="New Tab" binid="' + id + '" name="NewTab">');
-		})
+		});
 		$('input[name="NewTab"]').click(function()
 		{
 		    id = $(this).attr('binId');
 		    window.open('http://shiplink.microserve.ca/Flowlink/Burnaby//Index.php?Screen=Bins&Action=Edit&id=' + id, '_blank').focus();
-		})
+		});
 	    }
 	}
 	
@@ -165,7 +165,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 			// tempPos = document.body.scrollTop;
 			tempList = [];
 			if (shiplinkToRemove != ''){
-				for (var i = 0; i < allShiplinksList.length; i++){
+				for (let i = 0; i < allShiplinksList.length; i++){
 					if (allShiplinksList[i] == shiplinkToRemove){
 						myTable.deleteRow(i);
 					}
@@ -209,11 +209,11 @@ if (window.location.href.toLowerCase().includes("microserve")){
 			else{
 				tempImpSLList = impTextBox.value.replace(/^\n|\n$/g, '').split("\n");
 				convertedImpText = [];
-				for (var i  = 0; i < tempImpSLList.length; i++){
+				for (let i  = 0; i < tempImpSLList.length; i++){
 					tempImpSLList[i] = tempImpSLList[i].replace("-", "").replace("o", "0").replace("O", "0").toUpperCase();
 					if (tempImpSLList[i].trim('') != ''){ convertedImpText.push(tempImpSLList[i].trim('')); }
 				}
-				for (var i = 0; i < convertedImpText.length; i++){
+				for (let i = 0; i < convertedImpText.length; i++){
 					$.ajax({url: '/Flowlink/Burnaby/Ajax/AjaxGateway.php',
 					data: 
 					{
@@ -227,13 +227,14 @@ if (window.location.href.toLowerCase().includes("microserve")){
 						if (result == "Done!"){
 							var newRow = myTable.insertRow(-1);
 							newRow.outerHTML = `<tr class="Highlight"><td class="Highlight" onclick="window.open('http://shiplink.microserve.ca/Flowlink/Burnaby//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + convertedImpText[i] + `','_blank')">` + convertedImpText[i] + `</td><td class="Highlight" onclick=" window.open('http://shiplink.microserve.ca/Flowlink/Burnaby//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + convertedImpText[i] + `','_blank')"></td><td class="Highlight" onclick=" window.open('http://shiplink.microserve.ca/Flowlink/Burnaby//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + convertedImpText[i] + `','_blank')"></td><td class="Highlight" onclick=" window.open('http://shiplink.microserve.ca/Flowlink/Burnaby//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + convertedImpText[i] + `','_blank')"></td><td class="Highlight" onclick=" window.open('http://shiplink.microserve.ca/Flowlink/Burnaby//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + convertedImpText[i] + `','_blank')"></td><td class="Highlight" onclick=" window.open('http://shiplink.microserve.ca/Flowlink/Burnaby//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + convertedImpText[i] + `','_blank')"></td><td class="Highlight" onclick=" window.open('http://shiplink.microserve.ca/Flowlink/Burnaby//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + convertedImpText[i] + `','_blank')"></td><td class="Highlight">` + `<a name="Hide" shiplinkid="` + convertedImpText[i] + `" href="#" style="display: none;" onclick="return false;">Hide</a>` + `</td></tr>`;
+							document.getElementById('OuterOptionsWindowDiv').style.setProperty("top", (document.body.scrollHeight - window.innerHeight) + 'px');
 							allShiplinksList.push(convertedImpText[i]);
 							$('a[name="Hide"]').click(function(){
 								deleteFromTable($(this).attr('ShiplinkId'));
 							});
 							if (showHideButtons){
 								allHides = document.getElementsByName("Hide");
-								for (var j = 0; j < allHides.length; j++){
+								for (let j = 0; j < allHides.length; j++){
 									allHides[j].style.display = 'Block';
 								}
 							}
@@ -253,19 +254,19 @@ if (window.location.href.toLowerCase().includes("microserve")){
 			allRemoves = document.getElementsByName("Remove");
 			if (document.getElementById("showHide").checked == true){
 				showHideButtons = true;
-				for (var i = 0; i < allRemoves.length; i++){
+				for (let i = 0; i < allRemoves.length; i++){
 					allRemoves[i].style.display = 'None';
 				}
-				for (var i = 0; i < allHides.length; i++){
+				for (let i = 0; i < allHides.length; i++){
 					allHides[i].style.display = 'Block';
 				}
 			}
 			else{
 				showHideButtons = false;
-				for (var i = 0; i < allHides.length; i++){
+				for (let i = 0; i < allHides.length; i++){
 					allHides[i].style.display = 'None';
 				}
-				for (var i = 0; i < allRemoves.length; i++){
+				for (let i = 0; i < allRemoves.length; i++){
 					allRemoves[i].style.display = 'Block';
 				}
 			}
@@ -336,10 +337,10 @@ if (window.location.href.toLowerCase().includes("microserve")){
 
 
 		//Refresh table with new tab clicks
-		for (var i = 0, row; row = myTable.rows[i]; i++){
+		for (let i = 0, row; row = myTable.rows[i]; i++){
 			currValue = row.cells[0].innerHTML;
 			if (row.querySelectorAll(".Highlight").length > 0){
-				for (var j = 0; j < row.cells.length-1; j++){
+				for (let j = 0; j < row.cells.length-1; j++){
 					col = row.cells[j];
 					col.outerHTML = `<td class="Highlight" onclick="window.open('http://shiplink.microserve.ca/Flowlink/Burnaby//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + currValue + `','_blank')">` + col.innerHTML + `</td>`;
 				}
@@ -396,7 +397,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 						});
 						if (showHideButtons){
 							allHides = document.getElementsByName("Hide");
-							for (var i = 0; i < allHides.length; i++){
+							for (let i = 0; i < allHides.length; i++){
 								allHides[i].style.display = 'Block';
 							}
 						}
@@ -493,7 +494,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 	checkNewSerial = function(type){
 		if (type == 'Product')
 		{
-		    CallJSONMethod('Incoming','CreateNewItem', $('#AssetForm').serialize(),[0,"refresh"])
+		    CallJSONMethod('Incoming','CreateNewItem', $('#AssetForm').serialize(),[0,"refresh"]);
 		    return;
 		}
 		    $.getJSON('/Flowlink/Burnaby/Ajax/AjaxGateway.php?Screen=Incoming&Action=CheckSerial',
@@ -514,7 +515,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 				 $('#Dialog') 
 				    .html('This asset already exists and is in the warehouse.<br/>' + 
 					  'It is located at: ' + data.Location)
-				    .dialog('option','buttons',{'OK': function(){$('#Dialog').dialog('close')}})
+				    .dialog('option','buttons',{'OK': function(){$('#Dialog').dialog('close');}})
 				    .dialog('open');
 			   break;
 			   case "Found Asset":
@@ -550,7 +551,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 			   }
 
 		    }
-	)};
+	);};
 	var callingBulkRN = false;
 	var deleting40A2srn = false;
 	
