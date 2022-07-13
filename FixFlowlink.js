@@ -927,6 +927,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 			window.scrollTo(0, 0);
 			document.body.style.overflowX = "hidden";
 			document.body.style.overflowY = "hidden";
+			document.getElementById("SerialNumberPastingBox").select();
 		};
 		
 		closeBulkWindow = function(){
