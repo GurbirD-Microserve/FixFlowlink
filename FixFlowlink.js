@@ -287,6 +287,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 					window.open('http://shiplink.microserve.ca/Flowlink/Burnaby//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=' + convertedOpenText[i], '_blank').focus();
 				}
 				document.getElementById("blkOpen").value = '';
+				closeOptionsWindow;
 			}
 		};
 
@@ -644,11 +645,11 @@ if (window.location.href.toLowerCase().includes("microserve")){
 			margin-left: 25%;
 		">
 			<legend>Device Type</legend>
-			<input type="checkbox" id="checkDesktops" name="Desktop">
+			<input type="checkbox" id="checkDesktops" name="Desktop" checked>
 		  <label for="checkDesktops">Desktops</label><br>
-			<input type="checkbox" id="checkLaptops" name="Laptop">
+			<input type="checkbox" id="checkLaptops" name="Laptop" checked>
 		  <label for="checkLaptops">Laptops</label><br>
-			<input type="checkbox" id="checkMonitors" name="Monitor">
+			<input type="checkbox" id="checkMonitors" name="Monitor" checked>
 		  <label for="checkMonitors">Monitors</label><br>
 			<input type="checkbox" id="checkOthers" name="Other">
 		  <label for="checkOthers">Other</label>
@@ -661,7 +662,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 			margin-right: 25%;
 		">
 			<legend>Status</legend>
-			<input type="checkbox" name="Unreceived" id="checkUnreceived" checked="">
+			<input type="checkbox" name="Unreceived" id="checkUnreceived" checked>
 		  <label for="checkUnreceived">Unreceived</label><br>
 			<input type="checkbox" id="checkUnconfirmed" name="Unconfirmed">
 		  <label for="checkUnconfirmed">Unconfirmed</label><br>
