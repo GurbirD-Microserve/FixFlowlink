@@ -159,6 +159,11 @@ if (window.location.href.toLowerCase().includes("microserve")){
 		allShiplinksList = [];
 		showHideButtons = false;
 		window.scrollTo(0, document.body.scrollHeight);
+		document.addEventListener('keydown', function(event){
+			if(event.key === "Escape"){
+				closeOptionsWindow();
+			}
+		});
 
 		//FUNCTIONS
 		deleteFromTable = function (shiplinkToRemove){
