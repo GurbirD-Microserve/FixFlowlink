@@ -589,13 +589,17 @@ if (window.location.href.toLowerCase().includes("microserve")){
 	typeFilter.addEventListener("change",function(){
 		if (typeFilter.value == 'None'){
 			for (let i = 0; i < allItems.length; i++){
-				allItems[i].style.display = "block";
+				if (allSerials[i] != "deletedThisSerial"){
+					allItems[i].style.display = "block";
+				}
 			}
 		}    
 		else{
 			for (let i = 0; i < allItems.length; i++){
 				if (allTypes[i] == typeFilter.value){
-					allItems[i].style.display = "block";
+					if (allSerials[i] != "deletedThisSerial"){
+						allItems[i].style.display = "block";
+					}
 				}
 				else{
 					allItems[i].style.display = "none";
