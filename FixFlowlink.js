@@ -106,7 +106,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 			cityforFlowlink = 'Victoria';
 		}
 
-	if (window.location.search == "?Screen=Quarantine"){ //Quarantine page
+	if (window.location.search == "?Screen=Quarantine" && cityforFlowlink == 'Burnaby'){ //Quarantine page
 	    if (document.body.style.backgroundColor != 'rgb(254, 254, 254)'){ 
 		document.body.style.backgroundColor = 'rgb(254, 254, 254)';
 		$('input[name="Edit"]').each(function()
