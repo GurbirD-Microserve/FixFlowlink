@@ -89,6 +89,288 @@ if (window.location.href.toLowerCase().includes("microserve")){
 	    window.close();
 	}
 	
+	if (window.location.search.includes("?cmd=shiplink&action=AddProducts&id=")){ //Bulk Add Products
+		if (document.body.style.backgroundColor != 'rgb(254, 254, 254)'){ 
+			document.body.style.backgroundColor = 'rgb(254, 254, 254)';
+			document.getElementsByClassName("SubMenu")[0].querySelectorAll("a")[1].insertAdjacentHTML("afterend", '&nbsp;<a href="javascript:void(0);" id="BulkSLAdd">Bulk Products</a>');
+			
+			currentAddErrorList = [];
+			currentAddAttemptCount = 0;
+			productTypesValidFull = [
+				'Desktop',
+				'Laptop',
+				'Network Printer',
+				'Thin Client',
+				'Tablet',
+				'Scanner',
+				'Monitor-Tracked',
+				'Tracked Docking Station'
+			];
+			productTypesValidHalf = [
+				'desktop',
+				'laptop',
+				'printer',
+				'thin',
+				'tablet',
+				'scanner',
+				'monitor',
+				'dock'
+			];
+			
+			openBulkSLAddWindow = function (){
+				backupBulkSLAddWindowHTML = `<div style="
+				  height: 100vh;
+				  width: 100vw;
+				  position: absolute;
+				  top: 0;
+				  left: 0;
+				  background-color: #0000002b;
+				  "><div style="
+				  height: 100vh;
+				  width: 100vw;
+				  position: absolute;
+				  top: 0;
+				  left: 0;
+				  display: none;
+				  " id="addControlsBlocker"></div>
+					<div id="ActualBulkSLAddWindow" style="
+					width: 75vw;
+					height: 75vh;
+					margin-top: 12vh;
+					margin-left: 12vw;
+					background-color: #ffffff;
+					padding: 0.5vw;
+					"><span class="Title">Add Bulks Products</span><button style="float:right" class="Title" onclick="closeBulkSLAddWindow()">X</button><br><br><br><span style="margin-left: 10%;">Types:</span><span style="margin-left: 10%;">Makes:</span><span style="margin-left: 10%;">Models:</span><span style="margin-left: 10%;">Serials:</span><span style="margin-left: 10%;">Asset Tags:</span><span style="margin-left: 10%;">Workorders:</span><br>
+				<textarea style="width:15%;margin-left: 1%;" rows="30" id="boxforTypes" class=""></textarea><textarea style="width:15%;margin-left: 1%;" rows="30" id="boxforMakes" class=""></textarea><textarea style="width:15%;margin-left: 1%;" rows="30" id="boxforModels" class=""></textarea><textarea style="width:15%;margin-left: 1%;" rows="30" id="boxforSerials" class=""></textarea><textarea style="width:15%;margin-left: 1%;" rows="30" id="boxforAssetTags" class=""></textarea><textarea style="width:15%;margin-left: 1%;" rows="30" id="boxforWorkorders" placeholder="Write &quot;Blank&quot; for none"></textarea><br><button style="float:right" id="addProductsButton" onclick="addProductsButtonFunction()">Add All Products</button></div></div>`;
+				document.getElementById("OuterBulkSLAddWindowDiv").innerHTML = backupBulkSLAddWindowHTML;
+				document.getElementById('OuterBulkSLAddWindowDiv').style.setProperty("top", '0px');
+				document.getElementById("OuterBulkSLAddWindowDiv").style.display = "block";
+				window.scrollTo(0, 0);
+				document.body.style.overflowX = "hidden";
+				document.body.style.overflowY = "hidden";
+			};
+			
+			closeBulkSLAddWindow = function (){
+				document.getElementById("OuterBulkSLAddWindowDiv").innerHTML = '';
+				document.getElementById("OuterBulkSLAddWindowDiv").style.display = "none";
+				document.body.style.overflowX = "scroll";
+				document.body.style.overflowY = "scroll";
+			};
+			
+			addProductsButtonFunction = function (){
+				currentAddErrorList = [];
+				currentAddAttemptCount = 0;
+				if (typeof document.getElementById("boxforTypes") === "undefined" || typeof document.getElementById("boxforMakes") === "undefined" || typeof document.getElementById("boxforModels") === "undefined" || typeof document.getElementById("boxforSerials") === "undefined" || typeof document.getElementById("boxforAssetTags") === "undefined" || typeof document.getElementById("boxforWorkorders") === "undefined"){
+					alert("Something went wrong. Try again.");
+					return;
+				}
+				addinglistTypes = [];
+				addinglistMakes = [];
+				addinglistModels = [];
+				addinglistSerials = [];
+				addinglistAssetTags = [];
+				addinglistWorkorders = [];
+				
+				//Serials
+				tempAddingList = [];
+				tempAddingList = document.getElementById("boxforSerials").value.replace(/^\n|\n$/g, '').split("\n");
+				for (let i = 0; i < tempAddingList.length; i++){
+					if (tempAddingList[i].trim('') != ''){
+						addinglistSerials.push(tempAddingList[i].trim(''));
+					}
+				}
+				//Types
+				tempAddingList = [];
+				tempAddingList = document.getElementById("boxforTypes").value.replace(/^\n|\n$/g, '').split("\n");
+				for (let i = 0; i < tempAddingList.length; i++){
+					currentTypeTest = '';
+					if (addinglistTypes.length > addinglistSerials.length){
+						alert("Amount of items do not match, please check again.");
+						currentAddErrorList = [];
+						return;
+					}
+					if (tempAddingList[i].trim('') != ''){
+						if (addinglistSerials[addinglistTypes.length] == 'SKIPTHISSERIALOK'){
+							addinglistTypes.push('SKIPTHISSERIALOK');
+						}
+						else{
+							for (let j = 0; j < productTypesValidHalf.length; j++){
+								if ( productTypesValidHalf[j].includes(tempAddingList[i].toLowerCase()) || tempAddingList[i].toLowerCase().includes(productTypesValidHalf[j]) ){
+									currentTypeTest = productTypesValidFull[j];
+								}
+							}
+							if (currentTypeTest == 'Monitor-Tracked' && tempAddingList[i].toUpperCase().includes('L')){
+								currentTypeTest = 'Leased Monitor';
+							}
+							if (currentTypeTest == ''){
+								currentAddErrorList.push(addinglistSerials[addinglistTypes.length]);
+								addinglistTypes.push('SKIPTHISSERIALOK');
+								addinglistSerials[addinglistTypes.length-1] = 'SKIPTHISSERIALOK';
+							}
+							else{
+								addinglistTypes.push(currentTypeTest);
+							}
+						}
+					currentTypeTest = '';
+					}
+				}
+				if (addinglistTypes.length != addinglistSerials.length){
+					alert("Amount of items do not match, please check again.");
+					currentAddAttemptCount = 0;
+					currentAddErrorList = [];
+					return;
+				}
+				//Makes
+				tempAddingList = [];
+				tempAddingList = document.getElementById("boxforMakes").value.replace(/^\n|\n$/g, '').split("\n");
+				for (let i = 0; i < tempAddingList.length; i++){
+					if (tempAddingList[i].trim('') != ''){
+						addinglistMakes.push(tempAddingList[i].trim(''));
+					}
+				}
+				if (addinglistMakes.length != addinglistSerials.length){
+					alert("Amount of items do not match, please check again.");
+					currentAddErrorList = [];
+					currentAddAttemptCount = 0;
+					return;
+				}
+				//Models
+				tempAddingList = [];
+				tempAddingList = document.getElementById("boxforModels").value.replace(/^\n|\n$/g, '').split("\n");
+				for (let i = 0; i < tempAddingList.length; i++){
+					if (tempAddingList[i].trim('') != ''){
+						addinglistModels.push(tempAddingList[i].trim(''));
+					}
+				}
+				if (addinglistModels.length != addinglistSerials.length){
+					alert("Amount of items do not match, please check again.");
+					currentAddErrorList = [];
+					currentAddAttemptCount = 0;
+					return;
+				}
+				//Asset Tags
+				tempAddingList = [];
+				tempAddingList = document.getElementById("boxforAssetTags").value.replace(/^\n|\n$/g, '').split("\n");
+				for (let i = 0; i < tempAddingList.length; i++){
+					if (tempAddingList[i].trim('') != ''){
+						addinglistAssetTags.push(tempAddingList[i].trim(''));
+					}
+				}
+				if (addinglistAssetTags.length != addinglistSerials.length){
+					alert("Amount of items do not match, please check again.");
+					currentAddErrorList = [];
+					currentAddAttemptCount = 0;
+					return;
+				}
+				//Workorders
+				tempAddingList = [];
+				tempAddingList = document.getElementById("boxforWorkorders").value.replace(/^\n|\n$/g, '').split("\n");
+				for (let i = 0; i < tempAddingList.length; i++){
+					if (tempAddingList[i].trim('') != ''){
+						if (tempAddingList[i].trim('').toLowerCase() == 'blank'){
+							addinglistWorkorders.push('');
+						}
+						else{
+							addinglistWorkorders.push(tempAddingList[i].trim(''));
+						}
+					}
+				}
+				if (addinglistWorkorders.length != addinglistSerials.length){
+					alert("Amount of items do not match, please check again.");
+					currentAddErrorList = [];
+					currentAddAttemptCount = 0;
+					return;
+				}
+				
+				//All 6 lists have been made and verified
+				if ( addinglistTypes.length == addinglistMakes.length && addinglistMakes.length == addinglistModels.length && addinglistModels.length == addinglistSerials.length && addinglistSerials.length == addinglistAssetTags.length && addinglistAssetTags.length == addinglistWorkorders.length){
+					for (let i = 0; i < addinglistSerials.length; i++){
+						if (currentAddErrorList.indexOf(addinglistSerials[i]) == -1 && addinglistTypes[i] != 'SKIPTHISSERIALOK' && addinglistSerials[i] != 'SKIPTHISSERIALOK'){
+							myAddProductsFunction([addinglistTypes[i],addinglistMakes[i],addinglistModels[i],addinglistSerials[i],addinglistAssetTags[i],addinglistWorkorders[i]]);
+						}
+						else{
+							currentAddAttemptCount++;
+						}
+					}
+					document.getElementById("addControlsBlocker").style.display = "block";
+					document.getElementById("addProductsButton").innerText = "Please wait...";
+					document.body.style.cursor='progress';
+					setTimeout(function () {
+						waitForAddingP(addinglistTypes.length);
+					}, addinglistTypes.length * 500);
+				}
+				else{
+					alert("Amount of items do not match, please check again.");
+					currentAddErrorList = [];
+					currentAddAttemptCount = 0;
+					return;
+				}
+			};
+			
+			waitForAddingP = function (listLength){
+				if (currentAddAttemptCount >= listLength){
+					document.getElementById("addControlsBlocker").style.display = "none";
+					document.body.style.cursor='auto';
+					showAddedPResults();
+				}
+				else{
+					setTimeout(function () {
+						waitForAddingP(listLength);
+					}, 2000);
+				}
+			};
+			
+			showAddedPResults = function (){
+				doneAddingWindowHTML = `<span class="Title">Add Bulk Products</span><button style="float:right" class="Title" onclick="closeBulkSLAddWindow()">X</button><br><br><br><textarea readonly="" style="width:50%;margin-left: 12%;" rows="30" id="erroredAddingSerials" class=""></textarea>`;
+				document.getElementById("ActualBulkSLAddWindow").innerHTML = doneAddingWindowHTML;
+				document.getElementById("erroredAddingSerials").value = "Done.\n\nThese serial numbers may not have been added. Please check manually:\n\n";
+				if (currentAddErrorList.length == 0){
+					document.getElementById("erroredAddingSerials").value = "Done.";
+				}
+				for (let i = 0; i < currentAddErrorList.length; i++){
+					document.getElementById("erroredAddingSerials").value = document.getElementById("erroredAddingSerials").value + currentAddErrorList[i] + '\n';
+				}
+				if (currentAddErrorList.length > 0){
+					document.getElementById("erroredAddingSerials").value = document.getElementById("erroredAddingSerials").value + '\nPlease note that you cannot bulk add Hard Drives, Boxes, Peripherals, or Others.';
+				}
+				currentAddErrorList = [];
+				currentAddAttemptCount = 0;
+			};
+			
+			myAddProductsFunction = function(ItemDetailsList){
+				if (Object.prototype.toString.call(ItemDetailsList) != '[object Array]'){
+					return;
+				}
+				$.ajax({
+					type: 'POST', 
+					url: '/Shiplink/Ajax/AddProductToShiplink.php', 
+					data: 'ShiplinkID=' + $('#ShiplinkID')[0].value + '&ProductType=' + ItemDetailsList[0] + '&Make=' + ItemDetailsList[1] + '&Model=' + ItemDetailsList[2] + '&Serial=' + ItemDetailsList[3] + '&ClientNum=' + ItemDetailsList[4] + '&Workorder=' + ItemDetailsList[5] + '&Notes=', 
+					success: function(result)
+					{
+						// If there was no error,
+						// update the product table.
+						if (result.indexOf('Error') == -1)
+						{                              
+							$.get('/Shiplink/Ajax/ShiplinkProductsTable.php', 'DeleteButton=true&ShiplinkID=' + $('#ShiplinkID')[0].value , function(data)
+							{
+								$('#ShiplinkProductsTable').html(data);
+							});
+							currentAddAttemptCount++;
+						} else
+						{
+							currentAddErrorList.push(ItemDetailsList[3]);
+							currentAddAttemptCount++;
+						}
+						
+					}
+				});
+			};
+			
+			document.getElementById("mainLayout").insertAdjacentHTML("afterend", `<div id="OuterBulkSLAddWindowDiv" style="position: absolute; display: none; top: 0px;"></div>`);
+			document.getElementById("BulkSLAdd").addEventListener("click", openBulkSLAddWindow);
+		}
+	}
+	
 //-------------------------------------------------------------------------------------------------------------------------
 
 //------------FLOWLINK-----------------------------------------------------------------------------------------------------
@@ -106,7 +388,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 			cityforFlowlink = 'Victoria';
 		}
 
-	if (window.location.search == "?Screen=Quarantine" && cityforFlowlink == 'Burnaby'){ //Quarantine page
+	if (window.location.search == "?Screen=Quarantine"){ //Quarantine page
 	    if (document.body.style.backgroundColor != 'rgb(254, 254, 254)'){ 
 		document.body.style.backgroundColor = 'rgb(254, 254, 254)';
 		$('input[name="Edit"]').each(function()
