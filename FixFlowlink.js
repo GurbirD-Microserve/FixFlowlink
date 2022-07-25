@@ -1443,7 +1443,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 			document.body.style.cursor='progress';
 			setTimeout(function () {
 				waitForAdding(addinglistTypes.length);
-			}, addinglistTypes.length * 2000);
+			}, 2000);//addinglistTypes.length * 2000);
 		}
 		else{
 			alert("Amount of items do not match, please check again.");
@@ -1647,7 +1647,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 							totalMatches += 1;
 						}
 					}
-					HTMLtimeToTimeout = 0000 + (totalMatches * 2000);
+					HTMLtimeToTimeout = 0000 + (totalMatches * 500);
 					document.getElementById("bulkControlsBlocker").style.display = "block";
 					document.getElementById("bulkRcvButton").innerText = "Please wait...";
 					document.body.style.cursor='progress';
