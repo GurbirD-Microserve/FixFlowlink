@@ -134,14 +134,14 @@ if (window.location.href.toLowerCase().includes("microserve")){
 				  display: none;
 				  " id="addControlsBlocker"></div>
 					<div id="ActualBulkSLAddWindow" style="
-					width: 75vw;
+					width: 85vw;
 					height: 75vh;
 					margin-top: 12vh;
-					margin-left: 12vw;
+					margin-left: 7vw;
 					background-color: #ffffff;
 					padding: 0.5vw;
-					"><span class="Title">Add Bulks Products</span><button style="float:right" class="Title" onclick="closeBulkSLAddWindow()">X</button><br><br><br><span style="margin-left: 10%;">Types:</span><span style="margin-left: 10%;">Makes:</span><span style="margin-left: 10%;">Models:</span><span style="margin-left: 10%;">Serials:</span><span style="margin-left: 10%;">Asset Tags:</span><span style="margin-left: 10%;">Workorders:</span><br>
-				<textarea style="width:15%;margin-left: 1%;" rows="30" id="boxforTypes" class=""></textarea><textarea style="width:15%;margin-left: 1%;" rows="30" id="boxforMakes" class=""></textarea><textarea style="width:15%;margin-left: 1%;" rows="30" id="boxforModels" class=""></textarea><textarea style="width:15%;margin-left: 1%;" rows="30" id="boxforSerials" class=""></textarea><textarea style="width:15%;margin-left: 1%;" rows="30" id="boxforAssetTags" class=""></textarea><textarea style="width:15%;margin-left: 1%;" rows="30" id="boxforWorkorders" placeholder="Write &quot;Blank&quot; for none"></textarea><br><button style="float:right" id="addProductsButton" onclick="addProductsButtonFunction()">Add All Products</button></div></div>`;
+					"><span class="Title">Add Bulks Products</span><button style="float:right" class="Title" onclick="closeBulkSLAddWindow()">X</button><br><br><br><span style="margin-left: 7%;">Types:</span><span style="margin-left: 11%;">Makes:</span><span style="margin-left: 9%;">Models:</span><span style="margin-left: 9%;">Serials:</span><span style="margin-left: 9%;">Asset Tags:</span><span style="margin-left: 9%;">Workorders:</span><span style="margin-left: 9%;">Notes:</span><br>
+				<textarea style="width:13%;margin-left: 0.5%;" rows="30" id="boxforTypes" class=""></textarea><textarea style="width:13%;margin-left: 0.5%;" rows="30" id="boxforMakes" class=""></textarea><textarea style="width:13%;margin-left: 0.5%;" rows="30" id="boxforModels" class=""></textarea><textarea style="width:13%;margin-left: 0.5%;" rows="30" id="boxforSerials" class=""></textarea><textarea style="width:13%;margin-left: 0.5%;" rows="30" id="boxforAssetTags" placeholder="Write &quot;Blank&quot; for none" class=""></textarea><textarea style="width:13%;margin-left: 0.5%;" rows="30" id="boxforWorkorders" placeholder="Write &quot;Blank&quot; for none"></textarea><textarea style="width:13%;margin-left: 0.5%;" rows="30" id="boxforNotes" placeholder="Write &quot;Blank&quot; for none"></textarea><br><button style="float:right" id="addProductsButton" onclick="addProductsButtonFunction()">Add All Products</button></div></div>`;
 				document.getElementById("OuterBulkSLAddWindowDiv").innerHTML = backupBulkSLAddWindowHTML;
 				document.getElementById('OuterBulkSLAddWindowDiv').style.setProperty("top", '0px');
 				document.getElementById("OuterBulkSLAddWindowDiv").style.display = "block";
@@ -170,6 +170,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 				addinglistSerials = [];
 				addinglistAssetTags = [];
 				addinglistWorkorders = [];
+				addinglistNotes = [];
 				
 				//Serials
 				tempAddingList = [];
@@ -253,7 +254,12 @@ if (window.location.href.toLowerCase().includes("microserve")){
 				tempAddingList = document.getElementById("boxforAssetTags").value.replace(/^\n|\n$/g, '').split("\n");
 				for (let i = 0; i < tempAddingList.length; i++){
 					if (tempAddingList[i].trim('') != ''){
-						addinglistAssetTags.push(tempAddingList[i].trim(''));
+						if (tempAddingList[i].trim('').trim('"').toLowerCase().includes('blank')){
+							addinglistAssetTags.push('');
+						}
+						else{
+							addinglistAssetTags.push(tempAddingList[i].trim(''));
+						}
 					}
 				}
 				if (addinglistAssetTags.length != addinglistSerials.length){
@@ -267,7 +273,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 				tempAddingList = document.getElementById("boxforWorkorders").value.replace(/^\n|\n$/g, '').split("\n");
 				for (let i = 0; i < tempAddingList.length; i++){
 					if (tempAddingList[i].trim('') != ''){
-						if (tempAddingList[i].trim('').toLowerCase() == 'blank'){
+						if (tempAddingList[i].trim('').trim('"').toLowerCase().includes('blank')){
 							addinglistWorkorders.push('');
 						}
 						else{
@@ -281,12 +287,31 @@ if (window.location.href.toLowerCase().includes("microserve")){
 					currentAddAttemptCount = 0;
 					return;
 				}
+				//Notes
+				tempAddingList = [];
+				tempAddingList = document.getElementById("boxforNotes").value.replace(/^\n|\n$/g, '').split("\n");
+				for (let i = 0; i < tempAddingList.length; i++){
+					if (tempAddingList[i].trim('') != ''){
+						if (tempAddingList[i].trim('').toLowerCase() == 'blank'){
+							addinglistNotes.push('');
+						}
+						else{
+							addinglistNotes.push(tempAddingList[i].trim(''));
+						}
+					}
+				}
+				if (addinglistNotes.length != addinglistSerials.length){
+					alert("Amount of items do not match, please check again.");
+					currentAddErrorList = [];
+					currentAddAttemptCount = 0;
+					return;
+				}
 				
-				//All 6 lists have been made and verified
-				if ( addinglistTypes.length == addinglistMakes.length && addinglistMakes.length == addinglistModels.length && addinglistModels.length == addinglistSerials.length && addinglistSerials.length == addinglistAssetTags.length && addinglistAssetTags.length == addinglistWorkorders.length){
+				//All 7 lists have been made and verified
+				if ( addinglistTypes.length == addinglistMakes.length && addinglistMakes.length == addinglistModels.length && addinglistModels.length == addinglistSerials.length && addinglistSerials.length == addinglistAssetTags.length && addinglistAssetTags.length == addinglistWorkorders.length && addinglistWorkorders.length == addinglistNotes.length){
 					for (let i = 0; i < addinglistSerials.length; i++){
 						if (currentAddErrorList.indexOf(addinglistSerials[i]) == -1 && addinglistTypes[i] != 'SKIPTHISSERIALOK' && addinglistSerials[i] != 'SKIPTHISSERIALOK'){
-							myAddProductsFunction([addinglistTypes[i],addinglistMakes[i],addinglistModels[i],addinglistSerials[i],addinglistAssetTags[i],addinglistWorkorders[i]]);
+							myAddProductsFunction([addinglistTypes[i],addinglistMakes[i],addinglistModels[i],addinglistSerials[i],addinglistAssetTags[i],addinglistWorkorders[i],addinglistNotes[i]]);
 						}
 						else{
 							currentAddAttemptCount++;
@@ -344,7 +369,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 				$.ajax({
 					type: 'POST', 
 					url: '/Shiplink/Ajax/AddProductToShiplink.php', 
-					data: 'ShiplinkID=' + $('#ShiplinkID')[0].value + '&ProductType=' + ItemDetailsList[0] + '&Make=' + ItemDetailsList[1] + '&Model=' + ItemDetailsList[2] + '&Serial=' + ItemDetailsList[3] + '&ClientNum=' + ItemDetailsList[4] + '&Workorder=' + ItemDetailsList[5] + '&Notes=', 
+					data: 'ShiplinkID=' + $('#ShiplinkID')[0].value + '&ProductType=' + ItemDetailsList[0] + '&Make=' + ItemDetailsList[1] + '&Model=' + ItemDetailsList[2] + '&Serial=' + ItemDetailsList[3] + '&ClientNum=' + ItemDetailsList[4] + '&Workorder=' + ItemDetailsList[5] + '&Notes=' + ItemDetailsList[6], 
 					success: function(result)
 					{
 						// If there was no error,
