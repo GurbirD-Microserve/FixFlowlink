@@ -1,5 +1,6 @@
 if (window.location.href.toLowerCase().includes("microserve")){
 	
+//------------SHIPLINK-----------------------------------------------------------------------------------------------------
 	if (window.location.search.includes("?cmd=shiplink&action=Receive&id=")){
 		if (document.body.style.backgroundColor != 'rgb(254, 254, 254)'){ 
 			document.body.style.backgroundColor = 'rgb(254, 254, 254)';
@@ -88,19 +89,343 @@ if (window.location.href.toLowerCase().includes("microserve")){
 	    window.close();
 	}
 	
-	if (window.location.search == "?Screen=Quarantine"){
+	if (window.location.search.includes("?cmd=shiplink&action=AddProducts&id=")){ //Bulk Add Products
+		if (document.body.style.backgroundColor != 'rgb(254, 254, 254)'){ 
+			document.body.style.backgroundColor = 'rgb(254, 254, 254)';
+			document.getElementsByClassName("SubMenu")[0].querySelectorAll("a")[1].insertAdjacentHTML("afterend", '&nbsp;<a href="javascript:void(0);" id="BulkSLAdd">Bulk Products</a>');
+			
+			currentAddErrorList = [];
+			currentAddAttemptCount = 0;
+			productTypesValidFull = [
+				'Desktop',
+				'Laptop',
+				'Network Printer',
+				'Thin Client',
+				'Tablet',
+				'Scanner',
+				'Monitor-Tracked',
+				'Tracked Docking Station'
+			];
+			productTypesValidHalf = [
+				'desktop',
+				'laptop',
+				'printer',
+				'thin',
+				'tablet',
+				'scanner',
+				'monitor',
+				'dock'
+			];
+			
+			openBulkSLAddWindow = function (){
+				backupBulkSLAddWindowHTML = `<div style="
+				  height: 100vh;
+				  width: 100vw;
+				  position: absolute;
+				  top: 0;
+				  left: 0;
+				  background-color: #0000002b;
+				  "><div style="
+				  height: 100vh;
+				  width: 100vw;
+				  position: absolute;
+				  top: 0;
+				  left: 0;
+				  display: none;
+				  " id="addControlsBlocker"></div>
+					<div id="ActualBulkSLAddWindow" style="
+					width: 85vw;
+					height: 75vh;
+					margin-top: 12vh;
+					margin-left: 7vw;
+					background-color: #ffffff;
+					padding: 0.5vw;
+					"><span class="Title">Add Bulks Products</span><button style="float:right" class="Title" onclick="closeBulkSLAddWindow()">X</button><br><br><br><span style="margin-left: 7%;">Types:</span><span style="margin-left: 11%;">Makes:</span><span style="margin-left: 9%;">Models:</span><span style="margin-left: 9%;">Serials:</span><span style="margin-left: 9%;">Asset Tags:</span><span style="margin-left: 9%;">Workorders:</span><span style="margin-left: 9%;">Notes:</span><br>
+				<textarea style="width:13%;margin-left: 0.5%;" rows="30" id="boxforTypes" class=""></textarea><textarea style="width:13%;margin-left: 0.5%;" rows="30" id="boxforMakes" class=""></textarea><textarea style="width:13%;margin-left: 0.5%;" rows="30" id="boxforModels" class=""></textarea><textarea style="width:13%;margin-left: 0.5%;" rows="30" id="boxforSerials" class=""></textarea><textarea style="width:13%;margin-left: 0.5%;" rows="30" id="boxforAssetTags" placeholder="Write &quot;Blank&quot; for none" class=""></textarea><textarea style="width:13%;margin-left: 0.5%;" rows="30" id="boxforWorkorders" placeholder="Write &quot;Blank&quot; for none"></textarea><textarea style="width:13%;margin-left: 0.5%;" rows="30" id="boxforNotes" placeholder="Write &quot;Blank&quot; for none"></textarea><br><button style="float:right" id="addProductsButton" onclick="addProductsButtonFunction()">Add All Products</button></div></div>`;
+				document.getElementById("OuterBulkSLAddWindowDiv").innerHTML = backupBulkSLAddWindowHTML;
+				document.getElementById('OuterBulkSLAddWindowDiv').style.setProperty("top", '0px');
+				document.getElementById("OuterBulkSLAddWindowDiv").style.display = "block";
+				window.scrollTo(0, 0);
+				document.body.style.overflowX = "hidden";
+				document.body.style.overflowY = "hidden";
+			};
+			
+			closeBulkSLAddWindow = function (){
+				document.getElementById("OuterBulkSLAddWindowDiv").innerHTML = '';
+				document.getElementById("OuterBulkSLAddWindowDiv").style.display = "none";
+				document.body.style.overflowX = "scroll";
+				document.body.style.overflowY = "scroll";
+			};
+			
+			addProductsButtonFunction = function (){
+				currentAddErrorList = [];
+				currentAddAttemptCount = 0;
+				if (typeof document.getElementById("boxforTypes") === "undefined" || typeof document.getElementById("boxforMakes") === "undefined" || typeof document.getElementById("boxforModels") === "undefined" || typeof document.getElementById("boxforSerials") === "undefined" || typeof document.getElementById("boxforAssetTags") === "undefined" || typeof document.getElementById("boxforWorkorders") === "undefined"){
+					alert("Something went wrong. Try again.");
+					return;
+				}
+				addinglistTypes = [];
+				addinglistMakes = [];
+				addinglistModels = [];
+				addinglistSerials = [];
+				addinglistAssetTags = [];
+				addinglistWorkorders = [];
+				addinglistNotes = [];
+				
+				//Serials
+				tempAddingList = [];
+				tempAddingList = document.getElementById("boxforSerials").value.replace(/^\n|\n$/g, '').split("\n");
+				for (let i = 0; i < tempAddingList.length; i++){
+					if (tempAddingList[i].trim('') != ''){
+						addinglistSerials.push(tempAddingList[i].trim(''));
+					}
+				}
+				//Types
+				tempAddingList = [];
+				tempAddingList = document.getElementById("boxforTypes").value.replace(/^\n|\n$/g, '').split("\n");
+				for (let i = 0; i < tempAddingList.length; i++){
+					currentTypeTest = '';
+					if (addinglistTypes.length > addinglistSerials.length){
+						alert("Amount of items do not match, please check again.");
+						currentAddErrorList = [];
+						return;
+					}
+					if (tempAddingList[i].trim('') != ''){
+						if (addinglistSerials[addinglistTypes.length] == 'SKIPTHISSERIALOK'){
+							addinglistTypes.push('SKIPTHISSERIALOK');
+						}
+						else{
+							for (let j = 0; j < productTypesValidHalf.length; j++){
+								if ( productTypesValidHalf[j].includes(tempAddingList[i].toLowerCase()) || tempAddingList[i].toLowerCase().includes(productTypesValidHalf[j]) ){
+									currentTypeTest = productTypesValidFull[j];
+								}
+							}
+							if (currentTypeTest == 'Monitor-Tracked' && tempAddingList[i].toUpperCase().includes('L')){
+								currentTypeTest = 'Leased Monitor';
+							}
+							if (currentTypeTest == ''){
+								currentAddErrorList.push(addinglistSerials[addinglistTypes.length]);
+								addinglistTypes.push('SKIPTHISSERIALOK');
+								addinglistSerials[addinglistTypes.length-1] = 'SKIPTHISSERIALOK';
+							}
+							else{
+								addinglistTypes.push(currentTypeTest);
+							}
+						}
+					currentTypeTest = '';
+					}
+				}
+				if (addinglistTypes.length != addinglistSerials.length){
+					alert("Amount of items do not match, please check again.");
+					currentAddAttemptCount = 0;
+					currentAddErrorList = [];
+					return;
+				}
+				//Makes
+				tempAddingList = [];
+				tempAddingList = document.getElementById("boxforMakes").value.replace(/^\n|\n$/g, '').split("\n");
+				for (let i = 0; i < tempAddingList.length; i++){
+					if (tempAddingList[i].trim('') != ''){
+						addinglistMakes.push(tempAddingList[i].trim(''));
+					}
+				}
+				if (addinglistMakes.length != addinglistSerials.length){
+					alert("Amount of items do not match, please check again.");
+					currentAddErrorList = [];
+					currentAddAttemptCount = 0;
+					return;
+				}
+				//Models
+				tempAddingList = [];
+				tempAddingList = document.getElementById("boxforModels").value.replace(/^\n|\n$/g, '').split("\n");
+				for (let i = 0; i < tempAddingList.length; i++){
+					if (tempAddingList[i].trim('') != ''){
+						addinglistModels.push(tempAddingList[i].trim(''));
+					}
+				}
+				if (addinglistModels.length != addinglistSerials.length){
+					alert("Amount of items do not match, please check again.");
+					currentAddErrorList = [];
+					currentAddAttemptCount = 0;
+					return;
+				}
+				//Asset Tags
+				tempAddingList = [];
+				tempAddingList = document.getElementById("boxforAssetTags").value.replace(/^\n|\n$/g, '').split("\n");
+				for (let i = 0; i < tempAddingList.length; i++){
+					if (tempAddingList[i].trim('') != ''){
+						if (tempAddingList[i].trim('').trim('"').toLowerCase().includes('blank')){
+							addinglistAssetTags.push('');
+						}
+						else{
+							addinglistAssetTags.push(tempAddingList[i].trim(''));
+						}
+					}
+				}
+				if (addinglistAssetTags.length != addinglistSerials.length){
+					alert("Amount of items do not match, please check again.");
+					currentAddErrorList = [];
+					currentAddAttemptCount = 0;
+					return;
+				}
+				//Workorders
+				tempAddingList = [];
+				tempAddingList = document.getElementById("boxforWorkorders").value.replace(/^\n|\n$/g, '').split("\n");
+				for (let i = 0; i < tempAddingList.length; i++){
+					if (tempAddingList[i].trim('') != ''){
+						if (tempAddingList[i].trim('').trim('"').toLowerCase().includes('blank')){
+							addinglistWorkorders.push('');
+						}
+						else{
+							addinglistWorkorders.push(tempAddingList[i].trim(''));
+						}
+					}
+				}
+				if (addinglistWorkorders.length != addinglistSerials.length){
+					alert("Amount of items do not match, please check again.");
+					currentAddErrorList = [];
+					currentAddAttemptCount = 0;
+					return;
+				}
+				//Notes
+				tempAddingList = [];
+				tempAddingList = document.getElementById("boxforNotes").value.replace(/^\n|\n$/g, '').split("\n");
+				for (let i = 0; i < tempAddingList.length; i++){
+					if (tempAddingList[i].trim('') != ''){
+						if (tempAddingList[i].trim('').toLowerCase() == 'blank'){
+							addinglistNotes.push('');
+						}
+						else{
+							addinglistNotes.push(tempAddingList[i].trim(''));
+						}
+					}
+				}
+				if (addinglistNotes.length != addinglistSerials.length){
+					alert("Amount of items do not match, please check again.");
+					currentAddErrorList = [];
+					currentAddAttemptCount = 0;
+					return;
+				}
+				
+				//All 7 lists have been made and verified
+				if ( addinglistTypes.length == addinglistMakes.length && addinglistMakes.length == addinglistModels.length && addinglistModels.length == addinglistSerials.length && addinglistSerials.length == addinglistAssetTags.length && addinglistAssetTags.length == addinglistWorkorders.length && addinglistWorkorders.length == addinglistNotes.length){
+					for (let i = 0; i < addinglistSerials.length; i++){
+						if (currentAddErrorList.indexOf(addinglistSerials[i]) == -1 && addinglistTypes[i] != 'SKIPTHISSERIALOK' && addinglistSerials[i] != 'SKIPTHISSERIALOK'){
+							myAddProductsFunction([addinglistTypes[i],addinglistMakes[i],addinglistModels[i],addinglistSerials[i],addinglistAssetTags[i],addinglistWorkorders[i],addinglistNotes[i]]);
+						}
+						else{
+							currentAddAttemptCount++;
+						}
+					}
+					document.getElementById("addControlsBlocker").style.display = "block";
+					document.getElementById("addProductsButton").innerText = "Please wait...";
+					document.body.style.cursor='progress';
+					setTimeout(function () {
+						waitForAddingP(addinglistTypes.length);
+					}, addinglistTypes.length * 500);
+				}
+				else{
+					alert("Amount of items do not match, please check again.");
+					currentAddErrorList = [];
+					currentAddAttemptCount = 0;
+					return;
+				}
+			};
+			
+			waitForAddingP = function (listLength){
+				if (currentAddAttemptCount >= listLength){
+					document.getElementById("addControlsBlocker").style.display = "none";
+					document.body.style.cursor='auto';
+					showAddedPResults();
+				}
+				else{
+					setTimeout(function () {
+						waitForAddingP(listLength);
+					}, 2000);
+				}
+			};
+			
+			showAddedPResults = function (){
+				doneAddingWindowHTML = `<span class="Title">Add Bulk Products</span><button style="float:right" class="Title" onclick="closeBulkSLAddWindow()">X</button><br><br><br><textarea readonly="" style="width:50%;margin-left: 12%;" rows="30" id="erroredAddingSerials" class=""></textarea>`;
+				document.getElementById("ActualBulkSLAddWindow").innerHTML = doneAddingWindowHTML;
+				document.getElementById("erroredAddingSerials").value = "Done.\n\nThese serial numbers may not have been added. Please check manually:\n\n";
+				if (currentAddErrorList.length == 0){
+					document.getElementById("erroredAddingSerials").value = "Done.";
+				}
+				for (let i = 0; i < currentAddErrorList.length; i++){
+					document.getElementById("erroredAddingSerials").value = document.getElementById("erroredAddingSerials").value + currentAddErrorList[i] + '\n';
+				}
+				if (currentAddErrorList.length > 0){
+					document.getElementById("erroredAddingSerials").value = document.getElementById("erroredAddingSerials").value + '\nPlease note that you cannot bulk add Hard Drives, Boxes, Peripherals, or Others.';
+				}
+				currentAddErrorList = [];
+				currentAddAttemptCount = 0;
+			};
+			
+			myAddProductsFunction = function(ItemDetailsList){
+				if (Object.prototype.toString.call(ItemDetailsList) != '[object Array]'){
+					return;
+				}
+				$.ajax({
+					type: 'POST', 
+					url: '/Shiplink/Ajax/AddProductToShiplink.php', 
+					data: 'ShiplinkID=' + $('#ShiplinkID')[0].value + '&ProductType=' + ItemDetailsList[0] + '&Make=' + ItemDetailsList[1] + '&Model=' + ItemDetailsList[2] + '&Serial=' + ItemDetailsList[3] + '&ClientNum=' + ItemDetailsList[4] + '&Workorder=' + ItemDetailsList[5] + '&Notes=' + ItemDetailsList[6], 
+					success: function(result)
+					{
+						// If there was no error,
+						// update the product table.
+						if (result.indexOf('Error') == -1)
+						{                              
+							$.get('/Shiplink/Ajax/ShiplinkProductsTable.php', 'DeleteButton=true&ShiplinkID=' + $('#ShiplinkID')[0].value , function(data)
+							{
+								$('#ShiplinkProductsTable').html(data);
+							});
+							currentAddAttemptCount++;
+						} else
+						{
+							currentAddErrorList.push(ItemDetailsList[3]);
+							currentAddAttemptCount++;
+						}
+						
+					}
+				});
+			};
+			
+			document.getElementById("mainLayout").insertAdjacentHTML("afterend", `<div id="OuterBulkSLAddWindowDiv" style="position: absolute; display: none; top: 0px;"></div>`);
+			document.getElementById("BulkSLAdd").addEventListener("click", openBulkSLAddWindow);
+		}
+	}
+	
+//-------------------------------------------------------------------------------------------------------------------------
+
+//------------FLOWLINK-----------------------------------------------------------------------------------------------------
+	if (window.location.href.toLowerCase().includes("shiplink.microserve.ca/flowlink/")){ //Get city
+		cityforFlowlink = '';
+		colourforIncoming = 'rgb(254, 254, 254)';
+		if (window.location.href.toLowerCase().includes("burnaby")){
+			cityforFlowlink = 'Burnaby';
+			colourforIncoming = 'rgb(212, 245, 255)';
+		}
+		else if (window.location.href.toLowerCase().includes("calgary")){
+			cityforFlowlink = 'Calgary';
+		}
+		else if (window.location.href.toLowerCase().includes("victoria")){
+			cityforFlowlink = 'Victoria';
+		}
+
+	if (window.location.search == "?Screen=Quarantine" && cityforFlowlink == 'Burnaby'){ //Quarantine page
 	    if (document.body.style.backgroundColor != 'rgb(254, 254, 254)'){ 
 		document.body.style.backgroundColor = 'rgb(254, 254, 254)';
 		$('input[name="Edit"]').each(function()
 		{
 		    id = $(this).attr('binId');
 		    $(this).before('<input type="button" value="New Tab" binid="' + id + '" name="NewTab">');
-		})
+		});
 		$('input[name="NewTab"]').click(function()
 		{
 		    id = $(this).attr('binId');
-		    window.open('http://shiplink.microserve.ca/Flowlink/Burnaby//Index.php?Screen=Bins&Action=Edit&id=' + id, '_blank').focus();
-		})
+		    window.open('http://shiplink.microserve.ca/Flowlink/' + cityforFlowlink + '//Index.php?Screen=Bins&Action=Edit&id=' + id, '_blank').focus();
+		});
 	    }
 	}
 	
@@ -112,7 +437,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 	else{
 	//Disable refreshing
 	CallJSONMethod = function (screen, method, params, refresh, url){
-		$.getJSON('/Flowlink/Burnaby/Ajax/AjaxGateway.php?Screen=' + screen + '&Action=' + method,
+		$.getJSON('/Flowlink/' + cityforFlowlink + '/Ajax/AjaxGateway.php?Screen=' + screen + '&Action=' + method,
 		params,
 		function(data){
 			  if (data.Result == 'OK')
@@ -151,21 +476,26 @@ if (window.location.href.toLowerCase().includes("microserve")){
 	};
 
 	//Edit page
-	if (document.body.style.backgroundColor != 'rgb(212, 245, 255)'){
-		document.body.style.backgroundColor = 'rgb(212, 245, 255)'; //Init
-		document.getElementById("import").outerHTML = document.getElementById("import").outerHTML;
+	if (document.body.style.backgroundColor != colourforIncoming){
+		document.body.style.backgroundColor = colourforIncoming; //Init
+		if (cityforFlowlink == 'Burnaby'){document.getElementById("import").outerHTML = document.getElementById("import").outerHTML;}
 		document.getElementById("Main").insertAdjacentHTML("afterend", `<div id="OuterOptionsWindowDiv" style="position: absolute; display: none; top: 0px;"></div>`);
 		myTable = document.querySelectorAll("tbody")[0];
 		allShiplinksList = [];
 		showHideButtons = false;
 		window.scrollTo(0, document.body.scrollHeight);
+		document.addEventListener('keydown', function(event){
+			if(event.key === "Escape"){
+				closeOptionsWindow();
+			}
+		});
 
 		//FUNCTIONS
 		deleteFromTable = function (shiplinkToRemove){
 			// tempPos = document.body.scrollTop;
 			tempList = [];
 			if (shiplinkToRemove != ''){
-				for (var i = 0; i < allShiplinksList.length; i++){
+				for (let i = 0; i < allShiplinksList.length; i++){
 					if (allShiplinksList[i] == shiplinkToRemove){
 						myTable.deleteRow(i);
 					}
@@ -214,7 +544,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 					if (tempImpSLList[i].trim('') != ''){ convertedImpText.push(tempImpSLList[i].trim('')); }
 				}
 				for (let i = 0; i < convertedImpText.length; i++){
-					$.ajax({url: '/Flowlink/Burnaby/Ajax/AjaxGateway.php',
+					$.ajax({url: '/Flowlink/' + cityforFlowlink + '/Ajax/AjaxGateway.php',
 					data: 
 					{
 						Screen: 'Incoming',
@@ -226,11 +556,18 @@ if (window.location.href.toLowerCase().includes("microserve")){
 						var result = $.trim(data);
 						if (result == "Done!"){
 							var newRow = myTable.insertRow(-1);
-							newRow.outerHTML = `<tr class="Highlight"><td class="Highlight" onclick="window.open('http://shiplink.microserve.ca/Flowlink/Burnaby//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + convertedImpText[i] + `','_blank')">` + convertedImpText[i] + `</td><td class="Highlight" onclick=" window.open('http://shiplink.microserve.ca/Flowlink/Burnaby//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + convertedImpText[i] + `','_blank')"></td><td class="Highlight" onclick=" window.open('http://shiplink.microserve.ca/Flowlink/Burnaby//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + convertedImpText[i] + `','_blank')"></td><td class="Highlight" onclick=" window.open('http://shiplink.microserve.ca/Flowlink/Burnaby//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + convertedImpText[i] + `','_blank')"></td><td class="Highlight" onclick=" window.open('http://shiplink.microserve.ca/Flowlink/Burnaby//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + convertedImpText[i] + `','_blank')"></td><td class="Highlight" onclick=" window.open('http://shiplink.microserve.ca/Flowlink/Burnaby//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + convertedImpText[i] + `','_blank')"></td><td class="Highlight" onclick=" window.open('http://shiplink.microserve.ca/Flowlink/Burnaby//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + convertedImpText[i] + `','_blank')"></td><td class="Highlight">` + `<a name="Hide" shiplinkid="` + convertedImpText[i] + `" href="#" style="display: none;" onclick="return false;">Hide</a>` + `</td></tr>`;
+							newRow.outerHTML = `<tr class="Highlight"><td class="Highlight" onclick="window.open('http://shiplink.microserve.ca/Flowlink/` + cityforFlowlink + `//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + convertedImpText[i] + `','_blank')">` + convertedImpText[i] + `</td><td class="Highlight" onclick=" window.open('http://shiplink.microserve.ca/Flowlink/` + cityforFlowlink + `//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + convertedImpText[i] + `','_blank')"></td><td class="Highlight" onclick=" window.open('http://shiplink.microserve.ca/Flowlink/` + cityforFlowlink + `//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + convertedImpText[i] + `','_blank')"></td><td class="Highlight" onclick=" window.open('http://shiplink.microserve.ca/Flowlink/` + cityforFlowlink + `//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + convertedImpText[i] + `','_blank')"></td><td class="Highlight" onclick=" window.open('http://shiplink.microserve.ca/Flowlink/` + cityforFlowlink + `//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + convertedImpText[i] + `','_blank')"></td><td class="Highlight" onclick=" window.open('http://shiplink.microserve.ca/Flowlink/` + cityforFlowlink + `//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + convertedImpText[i] + `','_blank')"></td><td class="Highlight" onclick=" window.open('http://shiplink.microserve.ca/Flowlink/` + cityforFlowlink + `//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + convertedImpText[i] + `','_blank')"></td><td class="Highlight">` + `<a name="Hide" shiplinkid="` + convertedImpText[i] + `" href="#" style="display: none;" onclick="return false;">Hide</a>` + `</td></tr>`;
+							document.getElementById('OuterOptionsWindowDiv').style.setProperty("top", (document.body.scrollHeight - window.innerHeight) + 'px');
 							allShiplinksList.push(convertedImpText[i]);
 							$('a[name="Hide"]').click(function(){
 								deleteFromTable($(this).attr('ShiplinkId'));
 							});
+							if (showHideButtons){
+								allHides = document.getElementsByName("Hide");
+								for (let j = 0; j < allHides.length; j++){
+									allHides[j].style.display = 'Block';
+								}
+							}
 						}
 						else{
 							alert(result);
@@ -247,19 +584,19 @@ if (window.location.href.toLowerCase().includes("microserve")){
 			allRemoves = document.getElementsByName("Remove");
 			if (document.getElementById("showHide").checked == true){
 				showHideButtons = true;
-				for (var i = 0; i < allRemoves.length; i++){
+				for (let i = 0; i < allRemoves.length; i++){
 					allRemoves[i].style.display = 'None';
 				}
-				for (var i = 0; i < allHides.length; i++){
+				for (let i = 0; i < allHides.length; i++){
 					allHides[i].style.display = 'Block';
 				}
 			}
 			else{
 				showHideButtons = false;
-				for (var i = 0; i < allHides.length; i++){
+				for (let i = 0; i < allHides.length; i++){
 					allHides[i].style.display = 'None';
 				}
-				for (var i = 0; i < allRemoves.length; i++){
+				for (let i = 0; i < allRemoves.length; i++){
 					allRemoves[i].style.display = 'Block';
 				}
 			}
@@ -278,9 +615,10 @@ if (window.location.href.toLowerCase().includes("microserve")){
 					if (tempOpenSLList[i].trim('') != ''){ convertedOpenText.push(tempOpenSLList[i].trim('')); }
 				}
 				for (let i = 0; i < convertedOpenText.length; i++){
-					window.open('http://shiplink.microserve.ca/Flowlink/Burnaby//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=' + convertedOpenText[i], '_blank').focus();
+					window.open('http://shiplink.microserve.ca/Flowlink/' + cityforFlowlink + '//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=' + convertedOpenText[i], '_blank').focus();
 				}
 				document.getElementById("blkOpen").value = '';
+				closeOptionsWindow();
 			}
 		};
 
@@ -327,14 +665,13 @@ if (window.location.href.toLowerCase().includes("microserve")){
 			window.scrollTo(0, document.body.scrollHeight);
 		};
 
-
 		//Refresh table with new tab clicks
-		for (var i = 0, row; row = myTable.rows[i]; i++){
+		for (let i = 0, row; row = myTable.rows[i]; i++){
 			currValue = row.cells[0].innerHTML;
 			if (row.querySelectorAll(".Highlight").length > 0){
-				for (var j = 0; j < row.cells.length-1; j++){
+				for (let j = 0; j < row.cells.length-1; j++){
 					col = row.cells[j];
-					col.outerHTML = `<td class="Highlight" onclick="window.open('http://shiplink.microserve.ca/Flowlink/Burnaby//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + currValue + `','_blank')">` + col.innerHTML + `</td>`;
+					col.outerHTML = `<td class="Highlight" onclick="window.open('http://shiplink.microserve.ca/Flowlink/` + cityforFlowlink + `//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + currValue + `','_blank')">` + col.innerHTML + `</td>`;
 				}
 				if (row.querySelectorAll("[name=Remove]").length > 0){
 					row.cells[row.cells.length-1].innerHTML = `<a name="Hide" shiplinkid="` + currValue + `" href="#" style="display: none;" onclick="return false;">Hide</a>` + `<a name="Remove" shiplinkid="` + currValue + `" href="#" style="display: block;" onclick="return false;">Remove</a>`;
@@ -344,7 +681,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 				}
 			}
 			else{
-				row.cells[0].insertAdjacentHTML("afterend", `&nbsp;&nbsp;&nbsp;&nbsp;<a name="Hide" shiplinkid="` + currValue + `" href="#" style="display: none;" onclick="return false;">Hide</a>`);
+				row.cells[0].insertAdjacentHTML("beforeend", `<a name="Hide" shiplinkid="` + currValue + `" href="#" style="display: none; float: right;" onclick="return false;">Hide&nbsp;&nbsp;&nbsp;&nbsp;</a>`);
 			}
 			allShiplinksList.push(currValue);
 		}
@@ -366,8 +703,9 @@ if (window.location.href.toLowerCase().includes("microserve")){
 		});
 
 		//Add import onclick
+		if (cityforFlowlink == 'Burnaby'){
 		$('#import').click(function(){
-			$.ajax({url: '/Flowlink/Burnaby/Ajax/AjaxGateway.php',
+			$.ajax({url: '/Flowlink/' + cityforFlowlink + '/Ajax/AjaxGateway.php',
 				data: 
 				{
 					Screen: 'Incoming',
@@ -380,20 +718,26 @@ if (window.location.href.toLowerCase().includes("microserve")){
 					if (result == "Done!"){
 						alert('Done');
 						var newRow = myTable.insertRow(-1);
-						newRow.outerHTML = `<tr class="Highlight"><td class="Highlight" onclick="window.open('http://shiplink.microserve.ca/Flowlink/Burnaby//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + document.getElementById("ShiplinkID").value + `','_blank')">` + document.getElementById("ShiplinkID").value + `</td><td class="Highlight" onclick=" window.open('http://shiplink.microserve.ca/Flowlink/Burnaby//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + document.getElementById("ShiplinkID").value + `','_blank')"></td><td class="Highlight" onclick=" window.open('http://shiplink.microserve.ca/Flowlink/Burnaby//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + document.getElementById("ShiplinkID").value + `','_blank')"></td><td class="Highlight" onclick=" window.open('http://shiplink.microserve.ca/Flowlink/Burnaby//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + document.getElementById("ShiplinkID").value + `','_blank')"></td><td class="Highlight" onclick=" window.open('http://shiplink.microserve.ca/Flowlink/Burnaby//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + document.getElementById("ShiplinkID").value + `','_blank')"></td><td class="Highlight" onclick=" window.open('http://shiplink.microserve.ca/Flowlink/Burnaby//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + document.getElementById("ShiplinkID").value + `','_blank')"></td><td class="Highlight" onclick=" window.open('http://shiplink.microserve.ca/Flowlink/Burnaby//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + document.getElementById("ShiplinkID").value + `','_blank')"></td><td class="Highlight">` + `<a name="Hide" shiplinkid="` + document.getElementById("ShiplinkID").value + `" href="#" style="display: none;" onclick="return false;">Hide</a>` + `</td></tr>`;
+						newRow.outerHTML = `<tr class="Highlight"><td class="Highlight" onclick="window.open('http://shiplink.microserve.ca/Flowlink/` + cityforFlowlink + `//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + document.getElementById("ShiplinkID").value + `','_blank')">` + document.getElementById("ShiplinkID").value + `</td><td class="Highlight" onclick=" window.open('http://shiplink.microserve.ca/Flowlink/` + cityforFlowlink + `//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + document.getElementById("ShiplinkID").value + `','_blank')"></td><td class="Highlight" onclick=" window.open('http://shiplink.microserve.ca/Flowlink/` + cityforFlowlink + `//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + document.getElementById("ShiplinkID").value + `','_blank')"></td><td class="Highlight" onclick=" window.open('http://shiplink.microserve.ca/Flowlink/` + cityforFlowlink + `//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + document.getElementById("ShiplinkID").value + `','_blank')"></td><td class="Highlight" onclick=" window.open('http://shiplink.microserve.ca/Flowlink/` + cityforFlowlink + `//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + document.getElementById("ShiplinkID").value + `','_blank')"></td><td class="Highlight" onclick=" window.open('http://shiplink.microserve.ca/Flowlink/` + cityforFlowlink + `//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + document.getElementById("ShiplinkID").value + `','_blank')"></td><td class="Highlight" onclick=" window.open('http://shiplink.microserve.ca/Flowlink/` + cityforFlowlink + `//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + document.getElementById("ShiplinkID").value + `','_blank')"></td><td class="Highlight">` + `<a name="Hide" shiplinkid="` + document.getElementById("ShiplinkID").value + `" href="#" style="display: none;" onclick="return false;">Hide</a>` + `</td></tr>`;
 						allShiplinksList.push(document.getElementById("ShiplinkID").value);
 						document.getElementById("ShiplinkID").value = '';
 						window.scrollTo(0, document.body.scrollHeight);
 						$('a[name="Hide"]').click(function(){
 							deleteFromTable($(this).attr('ShiplinkId'));
 						});
+						if (showHideButtons){
+							allHides = document.getElementsByName("Hide");
+							for (let i = 0; i < allHides.length; i++){
+								allHides[i].style.display = 'Block';
+							}
+						}
 					}
 					else{
 						alert(result);
 					}
 				}
 			});
-		});
+		});}
 
 		//Add advanced button
 		document.getElementById("Logout").insertAdjacentHTML("beforebegin", '<input type="button" class="cssButton" value="Advanced" id="Advanced">');
@@ -402,9 +746,9 @@ if (window.location.href.toLowerCase().includes("microserve")){
 	}
 	}
 	
-	if (window.location.search.includes("?Screen=Incoming&Action=Shiplink&")){
+	if (window.location.search.includes("?Screen=Incoming&Action=Shiplink&")){ //Receive page
 	CallJSONMethod = function (screen, method, params, refresh, url){
-		$.getJSON('/Flowlink/Burnaby/Ajax/AjaxGateway.php?Screen=' + screen + '&Action=' + method,
+		$.getJSON('/Flowlink/' + cityforFlowlink + '/Ajax/AjaxGateway.php?Screen=' + screen + '&Action=' + method,
 		params,
 		function(data){
 			  if (data.Result == 'OK')
@@ -448,7 +792,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 		});
 	};
 	CallJSONMethodNODIALOG = function (screen, method, params, refresh, url){
-		$.getJSON('/Flowlink/Burnaby/Ajax/AjaxGateway.php?Screen=' + screen + '&Action=' + method,
+		$.getJSON('/Flowlink/' + cityforFlowlink + '/Ajax/AjaxGateway.php?Screen=' + screen + '&Action=' + method,
 			params,
 			function(data){
 			  if (data.Result == 'OK'){      			  
@@ -456,6 +800,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 				   if (Object.prototype.toString.call(refresh) == '[object Array]'){
 					   if (refresh[1] == "purple"){
 						   makePurple(refresh[0]);
+						   currentRcvAttemptCount++;
 					   }
 					   else if (refresh[1] == "delete"){
 							allItems[refresh[0]].style.display = "none";
@@ -464,13 +809,27 @@ if (window.location.href.toLowerCase().includes("microserve")){
 					   else if (refresh[1] == "refresh"){
 							window.location.reload();
 					   }
+					   else if (refresh[1] == "createPurple"){
+						   createPurpleSquare(refresh[0]);
+						   currentAddAttemptCount++;
+					   }
 				   }
 				}
 			  }
 			  else{
-				if (Object.prototype.toString.call(refresh) == '[object Array]'){
-				   if (deleting40A2srn && guessModel(refresh[0]) == "40A2"){
-					   CallJSONMethodNODIALOG('Incoming','DeleteSl', {RelationId: RelationId}, [refresh[0], "delete"]);
+				if (typeof refresh !== 'undefined'){
+				   if (Object.prototype.toString.call(refresh) == '[object Array]'){
+					   if (refresh[1] == "createPurple"){
+						   currentAddErrorList.push(refresh[0][3]);
+						   currentAddAttemptCount++;
+					   }
+					   else if (refresh[1] == "purple"){
+						   erroredList.push(allItems[refresh[0]].querySelectorAll("[name=OldSerial]")[0].value);
+						   currentRcvAttemptCount++;
+					   }
+					   else if (deleting40A2srn && guessModel(refresh[0]) == "40A2"){
+						   CallJSONMethodNODIALOG('Incoming','DeleteSl', {RelationId: RelationId}, [refresh[0], "delete"]);
+					   }
 				   }
 				}
 			  } 
@@ -480,10 +839,10 @@ if (window.location.href.toLowerCase().includes("microserve")){
 	checkNewSerial = function(type){
 		if (type == 'Product')
 		{
-		    CallJSONMethod('Incoming','CreateNewItem', $('#AssetForm').serialize(),[0,"refresh"])
+		    CallJSONMethod('Incoming','CreateNewItem', $('#AssetForm').serialize(),[0,"refresh"]);
 		    return;
 		}
-		    $.getJSON('/Flowlink/Burnaby/Ajax/AjaxGateway.php?Screen=Incoming&Action=CheckSerial',
+		    $.getJSON('/Flowlink/' + cityforFlowlink + '/Ajax/AjaxGateway.php?Screen=Incoming&Action=CheckSerial',
 			{
 			    Serial: $('#AssetForm').find('input[name="Serial"]').val()                   
 			},
@@ -501,7 +860,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 				 $('#Dialog') 
 				    .html('This asset already exists and is in the warehouse.<br/>' + 
 					  'It is located at: ' + data.Location)
-				    .dialog('option','buttons',{'OK': function(){$('#Dialog').dialog('close')}})
+				    .dialog('option','buttons',{'OK': function(){$('#Dialog').dialog('close');}})
 				    .dialog('open');
 			   break;
 			   case "Found Asset":
@@ -537,7 +896,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 			   }
 
 		    }
-	)};
+	);};
 	var callingBulkRN = false;
 	var deleting40A2srn = false;
 	
@@ -570,13 +929,17 @@ if (window.location.href.toLowerCase().includes("microserve")){
 	typeFilter.addEventListener("change",function(){
 		if (typeFilter.value == 'None'){
 			for (let i = 0; i < allItems.length; i++){
-				allItems[i].style.display = "block";
+				if (allSerials[i] != "deletedThisSerial"){
+					allItems[i].style.display = "block";
+				}
 			}
 		}    
 		else{
 			for (let i = 0; i < allItems.length; i++){
 				if (allTypes[i] == typeFilter.value){
-					allItems[i].style.display = "block";
+					if (allSerials[i] != "deletedThisSerial"){
+						allItems[i].style.display = "block";
+					}
 				}
 				else{
 					allItems[i].style.display = "none";
@@ -632,11 +995,11 @@ if (window.location.href.toLowerCase().includes("microserve")){
 			margin-left: 25%;
 		">
 			<legend>Device Type</legend>
-			<input type="checkbox" id="checkDesktops" name="Desktop">
+			<input type="checkbox" id="checkDesktops" name="Desktop" checked>
 		  <label for="checkDesktops">Desktops</label><br>
-			<input type="checkbox" id="checkLaptops" name="Laptop">
+			<input type="checkbox" id="checkLaptops" name="Laptop" checked>
 		  <label for="checkLaptops">Laptops</label><br>
-			<input type="checkbox" id="checkMonitors" name="Monitor">
+			<input type="checkbox" id="checkMonitors" name="Monitor" checked>
 		  <label for="checkMonitors">Monitors</label><br>
 			<input type="checkbox" id="checkOthers" name="Other">
 		  <label for="checkOthers">Other</label>
@@ -649,7 +1012,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 			margin-right: 25%;
 		">
 			<legend>Status</legend>
-			<input type="checkbox" name="Unreceived" id="checkUnreceived" checked="">
+			<input type="checkbox" name="Unreceived" id="checkUnreceived" checked>
 		  <label for="checkUnreceived">Unreceived</label><br>
 			<input type="checkbox" id="checkUnconfirmed" name="Unconfirmed">
 		  <label for="checkUnconfirmed">Unconfirmed</label><br>
@@ -815,6 +1178,365 @@ if (window.location.href.toLowerCase().includes("microserve")){
 		window.open(encodedUri);
 	};
 	
+	/////--------------------------------BULK ADDING FUNCTIONS---------------------
+	
+	currentAddErrorList = [];
+	currentAddAttemptCount = 0;
+	currentRcvAttemptCount = 0;
+	possibleTypes = [];
+	possibleTypesCaps = [];
+	possibleMakes = [];
+	possibleMakesCaps = [];
+	possibleModels = [];
+	possibleModelsCaps = [];
+	checkNewSerialNDADD = function (myAsset){
+			if (Object.prototype.toString.call(myAsset) != '[object Array]'){
+				return;
+			}
+			$.getJSON('/Flowlink/' + cityforFlowlink + '/Ajax/AjaxGateway.php?Screen=Incoming&Action=CheckSerial',{
+					Serial: myAsset[3]                   
+				},
+				function(data)
+				{
+				   switch (data.Result)
+				   {
+				   case 'FatalError':
+					   currentAddErrorList.push(myAsset[3]);
+					   currentAddAttemptCount++;
+					   return;
+				   break;
+				   case "Local Asset":
+						currentAddErrorList.push(myAsset[3]);
+						currentAddAttemptCount++;
+				   break;
+				   case "Found Asset":
+						 CallJSONMethodNODIALOG('Incoming','ProcessNewReturn',{ assetId: data.Id, shiplinkId: $('#ShiplinkId').val()}, [myAsset, 'createPurple']);
+					break;
+					default: 
+						CallJSONMethodNODIALOG('Incoming','CreateNewItem', 'Type=' + myAsset[0] + '&Make=' + myAsset[1] + '&Model=' + myAsset[2] + '&Serial=' + myAsset[3] + '&AssetTag=' + myAsset[4].replace(/\//g, '') + '&Parent=&MfgMonth=1&MfgYear=2019&Shiplink=' + $('#ShiplinkId').val() + '&Owner=' + $('#owner').val() + '&Organization=' + $('#organization').val() + '&Project=' + $('#project').val() + '&Location=Incoming&ItemType=Asset', [myAsset, 'createPurple']);//.replace(/ /g, "+"), [myAsset, 'createPurple']);
+				   }
+			});
+	};
+	
+	createPurpleSquare = function (assetList){
+		if (Object.prototype.toString.call(assetList) == '[object Array]'){
+			
+			document.getElementsByClassName("Item")[document.getElementsByClassName("Item").length - 1].insertAdjacentHTML('afterend',
+				`<div style="clear:both"></div>
+				<div class="Item">
+					<form>
+					<div class="ItemProperties Done ">  
+				<div class="Property">
+					<div class="Title">Type</div>
+					<div class="OldValue"><span name="OldType"></span></div>
+					<div>` + assetList[0] + `</div>
+				</div>
+				<div class="Property">
+					<div class="Title">Make</div>
+					<div class="OldValue"><span name="OldMake"></span></div>
+					<div>` + assetList[1] + `</div>
+					 
+				</div>
+				 <div class="Property">
+					<div class="Title">Model</div>
+					<div class="OldValue"><span name="OldModel"></span></div>
+					<div>` + assetList[2] + `</div>
+					 
+				</div>
+				 <div class="Property">
+					<div class="Title">Serial</div>
+					<div class="OldValue"><span name="OldSerial"> </span></div>
+					<div>` + assetList[3] + `</div>
+				</div>
+				 <div class="Property">
+					<div class="Title">Asset Tag</div>
+					<div class="OldValue"><span name="OldAssetTag"></span></div>
+					<div>` + assetList[4] + `</div>
+				</div>`
+			);
+			
+			window.scrollTo(0, document.body.scrollHeight);
+			document.getElementById('OuterAddWindowDiv').style.setProperty("top", (document.body.scrollHeight - window.innerHeight) + 'px');
+			
+			//allItems.push(document.getElementsByClassName("Item")[document.getElementsByClassName("Item").length - 1]);
+			allItems = document.getElementsByClassName("Item");
+			allTypes.push(assetList[0]);
+			allSerials.push(assetList[3]);
+			
+		}
+	};
+	
+	document.getElementById("Main").insertAdjacentHTML("afterend", `<div id="OuterAddWindowDiv" style="position: absolute; display: none; top: 0px;"></div>`);
+	openAddWindow = function (){
+		backupAddWindowHTML = `<div style="
+		  height: 100vh;
+		  width: 100vw;
+		  position: absolute;
+		  top: 0;
+		  left: 0;
+		  background-color: #0000002b;
+		  "><div style="
+		  height: 100vh;
+		  width: 100vw;
+		  position: absolute;
+		  top: 0;
+		  left: 0;
+		  display: none;
+		  " id="addControlsBlocker"></div>
+			<div id="ActualAddWindow" style="
+			width: 75vw;
+			height: 75vh;
+			margin-top: 12vh;
+			margin-left: 12vw;
+			background-color: #ffffff;
+			padding: 0.5vw;
+			"><span class="Title">Add Bulks Assets</span><button style="float:right" class="Title" onclick="closeAddWindow()">X</button><br><br><br><span style="margin-left: 12%;">Types:</span><span style="margin-left: 12%;">Makes:</span><span style="margin-left: 12%;">Models:</span><span style="margin-left: 12%;">Serials:</span><span style="margin-left: 12%;">Asset Tags:</span><br>
+		<textarea style="width:15%;margin-left: 5%;" rows="30" id="boxforTypes" class=""></textarea><textarea style="width:15%;margin-left: 1%;" rows="30" id="boxforMakes" class=""></textarea><textarea style="width:15%;margin-left: 1%;" rows="30" id="boxforModels" class=""></textarea><textarea style="width:15%;margin-left: 1%;" rows="30" id="boxforSerials" class=""></textarea><textarea style="width:15%;margin-left: 1%;" rows="30" id="boxforAssetTags" class=""></textarea><br><button style="float:right" id="addAssetsButton" onclick="addAssetsButtonFunction()">Add All Assets</button></div></div>`;
+		document.getElementById("OuterAddWindowDiv").innerHTML = backupAddWindowHTML;
+		document.getElementById('OuterAddWindowDiv').style.setProperty("top", '0px');
+		document.getElementById("OuterAddWindowDiv").style.display = "block";
+		window.scrollTo(0, 0);
+		document.body.style.overflowX = "hidden";
+		document.body.style.overflowY = "hidden";
+	};
+	
+	closeAddWindow = function(){
+		document.getElementById("OuterAddWindowDiv").innerHTML = '';
+		document.getElementById("OuterAddWindowDiv").style.display = "none";
+		document.body.style.overflowX = "scroll";
+		document.body.style.overflowY = "scroll";
+	};
+	
+	launchBulkAdding = function (){
+		possibleTypes = [];
+		possibleTypesCaps = [];
+		possibleMakes = [];
+		possibleMakesCaps = [];
+		possibleModels = [];
+		possibleModelsCaps = [];
+		for (let i = 0; i < document.getElementById("AssetForm").querySelectorAll("[name=Type]")[0].options.length; i++){
+			possibleTypes.push(document.getElementById("AssetForm").querySelectorAll("[name=Type]")[0].options[i].value);
+			possibleTypesCaps.push(document.getElementById("AssetForm").querySelectorAll("[name=Type]")[0].options[i].value.toUpperCase());
+		}
+		for (let i = 0; i < document.getElementById("AssetForm").querySelectorAll("[name=Make]")[0].options.length; i++){
+			possibleMakes.push(document.getElementById("AssetForm").querySelectorAll("[name=Make]")[0].options[i].value);
+			possibleMakesCaps.push(document.getElementById("AssetForm").querySelectorAll("[name=Make]")[0].options[i].value.toUpperCase());
+		}
+		for (let i = 0; i < document.getElementById("AssetForm").querySelectorAll("[name=Model]")[0].options.length; i++){
+			possibleModels.push(document.getElementById("AssetForm").querySelectorAll("[name=Model]")[0].options[i].value);
+			possibleModelsCaps.push(document.getElementById("AssetForm").querySelectorAll("[name=Model]")[0].options[i].value.toUpperCase());
+		}
+		openAddWindow();
+	};
+	
+	addAssetsButtonFunction = function (){
+		currentAddErrorList = [];
+		currentAddAttemptCount = 0;
+		if (typeof document.getElementById("boxforTypes") === "undefined" || typeof document.getElementById("boxforMakes") === "undefined" || typeof document.getElementById("boxforModels") === "undefined" || typeof document.getElementById("boxforSerials") === "undefined" || typeof document.getElementById("boxforAssetTags") === "undefined"){
+			alert("Something went wrong. Try again.");
+			return;
+		}
+		addinglistTypes = [];
+		addinglistMakes = [];
+		addinglistModels = [];
+		addinglistSerials = [];
+		addinglistAssetTags = [];
+		
+		//Serials
+		tempAddingList = [];
+		tempAddingList = document.getElementById("boxforSerials").value.replace(/^\n|\n$/g, '').split("\n");
+		for (let i = 0; i < tempAddingList.length; i++){
+			if (tempAddingList[i].trim('') != ''){
+				addinglistSerials.push(tempAddingList[i].trim(''));
+			}
+		}
+		//Types
+		tempAddingList = [];
+		tempAddingList = document.getElementById("boxforTypes").value.replace(/^\n|\n$/g, '').split("\n");
+		for (let i = 0; i < tempAddingList.length; i++){
+			if (addinglistTypes.length > addinglistSerials.length){
+				alert("Amount of items do not match, please check again.");
+				currentAddErrorList = [];
+				return;
+			}
+			if (tempAddingList[i].trim('') != ''){
+				if (addinglistSerials[addinglistTypes.length] == 'SKIPTHISSERIALOK'){
+					addinglistTypes.push('SKIPTHISSERIALOK');
+				}
+				else if (possibleTypesCaps.indexOf(tempAddingList[i].trim('').toUpperCase()) == -1){
+					currentAddErrorList.push(addinglistSerials[addinglistTypes.length]);
+					addinglistTypes.push('SKIPTHISSERIALOK');
+					addinglistSerials[addinglistTypes.length-1] = 'SKIPTHISSERIALOK';
+				}
+				else if (possibleTypesCaps.indexOf(tempAddingList[i].trim('').toUpperCase()) > -1){
+					addinglistTypes.push(possibleTypes[possibleTypesCaps.indexOf(tempAddingList[i].trim('').toUpperCase())]);
+				}
+			}
+		}
+		if (addinglistTypes.length != addinglistSerials.length){
+			alert("Amount of items do not match, please check again.");
+			currentAddAttemptCount = 0;
+			currentAddErrorList = [];
+			return;
+		}
+		//Makes
+		tempAddingList = [];
+		tempAddingList = document.getElementById("boxforMakes").value.replace(/^\n|\n$/g, '').split("\n");
+		for (let i = 0; i < tempAddingList.length; i++){
+			if (addinglistMakes.length > addinglistSerials.length){
+				alert("Amount of items do not match, please check again.");
+				currentAddErrorList = [];
+				return;
+			}
+			if (tempAddingList[i].trim('') != ''){
+				if (addinglistSerials[addinglistMakes.length] == 'SKIPTHISSERIALOK'){
+					addinglistMakes.push('SKIPTHISSERIALOK');
+				}
+				else if (possibleMakesCaps.indexOf(tempAddingList[i].trim('').toUpperCase()) == -1){
+					currentAddErrorList.push(addinglistSerials[addinglistMakes.length]);
+					addinglistMakes.push('SKIPTHISSERIALOK');
+					addinglistSerials[addinglistMakes.length-1] = 'SKIPTHISSERIALOK';
+				}
+				else if (possibleMakesCaps.indexOf(tempAddingList[i].trim('').toUpperCase()) > -1){
+					addinglistMakes.push(possibleMakes[possibleMakesCaps.indexOf(tempAddingList[i].trim('').toUpperCase())]);
+				}
+			}
+		}
+		if (addinglistMakes.length != addinglistSerials.length){
+			alert("Amount of items do not match, please check again.");
+			currentAddErrorList = [];
+			currentAddAttemptCount = 0;
+			return;
+		}
+		//Models
+		tempAddingList = [];
+		tempAddingList = document.getElementById("boxforModels").value.replace(/^\n|\n$/g, '').split("\n");
+		for (let i = 0; i < tempAddingList.length; i++){
+			if (addinglistModels.length > addinglistSerials.length){
+				alert("Amount of items do not match, please check again.");
+				currentAddErrorList = [];
+				return;
+			}
+			if (tempAddingList[i].trim('') != ''){
+				if (addinglistSerials[addinglistModels.length] == 'SKIPTHISSERIALOK'){
+					addinglistModels.push('SKIPTHISSERIALOK');
+				}
+				else if (possibleModelsCaps.indexOf(tempAddingList[i].trim('').toUpperCase()) == -1){
+					currentAddErrorList.push(addinglistSerials[addinglistModels.length]);
+					addinglistModels.push('SKIPTHISSERIALOK');
+					addinglistSerials[addinglistModels.length-1] = 'SKIPTHISSERIALOK';
+				}
+				else if (possibleModelsCaps.indexOf(tempAddingList[i].trim('').toUpperCase()) > -1){
+					addinglistModels.push(possibleModels[possibleModelsCaps.indexOf(tempAddingList[i].trim('').toUpperCase())]);
+				}
+			}
+		}
+		if (addinglistModels.length != addinglistSerials.length){
+			alert("Amount of items do not match, please check again.");
+			currentAddErrorList = [];
+			currentAddAttemptCount = 0;
+			return;
+		}
+		//Asset Tags
+		tempAddingList = [];
+		tempAddingList = document.getElementById("boxforAssetTags").value.replace(/^\n|\n$/g, '').split("\n");
+		for (let i = 0; i < tempAddingList.length; i++){
+			if (tempAddingList[i].trim('') != ''){
+				addinglistAssetTags.push(tempAddingList[i].trim(''));
+			}
+		}
+		if (addinglistAssetTags.length != addinglistSerials.length){
+			alert("Amount of items do not match, please check again.");
+			currentAddErrorList = [];
+			currentAddAttemptCount = 0;
+			return;
+		}
+		
+		
+		//All 5 lists have been made and verified finally bruh
+		if ( addinglistTypes.length == addinglistMakes.length && addinglistMakes.length == addinglistModels.length && addinglistModels.length == addinglistSerials.length && addinglistSerials.length == addinglistAssetTags.length){
+			for (let i = 0; i < addinglistSerials.length; i++){
+				if (currentAddErrorList.indexOf(addinglistSerials[i]) == -1 && addinglistTypes[i] != 'SKIPTHISSERIALOK' && addinglistMakes[i] != 'SKIPTHISSERIALOK' && addinglistModels[i] != 'SKIPTHISSERIALOK' && addinglistSerials[i] != 'SKIPTHISSERIALOK'){
+					checkNewSerialNDADD([addinglistTypes[i],addinglistMakes[i],addinglistModels[i],addinglistSerials[i],addinglistAssetTags[i]]);
+				}
+				else{
+					currentAddAttemptCount++;
+				}
+			}
+			document.getElementById("addControlsBlocker").style.display = "block";
+			document.getElementById("addAssetsButton").innerText = "Please wait...";
+			document.body.style.cursor='progress';
+			setTimeout(function () {
+				waitForAdding(addinglistTypes.length);
+			}, 2000);//addinglistTypes.length * 2000);
+		}
+		else{
+			alert("Amount of items do not match, please check again.");
+			currentAddErrorList = [];
+			currentAddAttemptCount = 0;
+			return;
+		}
+	};
+	
+	waitForAdding = function (listLength){
+		if (currentAddAttemptCount >= listLength){
+			document.getElementById("addControlsBlocker").style.display = "none";
+			document.body.style.cursor='auto';
+			showAddedResults();
+		}
+		else{
+			setTimeout(function () {
+				waitForAdding(listLength);
+			}, 5000);
+		}
+	};
+	
+	showAddedResults = function (){
+		doneAddingWindowHTML = `<span class="Title">Add Bulk Assets</span><button style="float:right" class="Title" onclick="closeAddWindow()">X</button><br><br><br><textarea readonly="" style="width:50%;margin-left: 12%;" rows="30" id="erroredAddingSerials" class=""></textarea>`;
+		document.getElementById("ActualAddWindow").innerHTML = doneAddingWindowHTML;
+		document.getElementById("erroredAddingSerials").value = "Done.\n\nThese serial numbers may not have been added. Please check manually:\n\n";
+		if (currentAddErrorList.length == 0){
+			document.getElementById("erroredAddingSerials").value = "Done.";
+		}
+		for (let i = 0; i < currentAddErrorList.length; i++){
+			document.getElementById("erroredAddingSerials").value = document.getElementById("erroredAddingSerials").value + currentAddErrorList[i] + '\n';
+		}
+		currentAddErrorList = [];
+		currentAddAttemptCount = 0;
+	};
+	
+	//Override their dialog window to add bulk button
+	function CreateNewItem(type, location, owner, organization, project, shiplink, parent){
+    $('#Dialog').load('/Flowlink/' + cityforFlowlink + '/Ajax/AjaxGateway.php',
+                     {
+                         Screen: 'Misc',
+                         Action: 'GetCreateAssetForm',
+                         location: location,
+                         owner: owner,
+                         shiplink: shiplink,
+                         organization: organization,
+                         project: project,
+                         Parent: parent == undefined ? '' : parent,
+                         Type: type
+                     },
+                         function()
+                         {
+                             
+                            $('#Dialog').dialog('option','buttons',
+                            {                                
+                                'Bulk': function() { $('#Dialog').dialog('close'); launchBulkAdding(); },
+                                'OK': function() { checkNewSerial(type); },
+                                'Cancel': function() { $('#Dialog').dialog('close');}
+                            });
+
+                            $('#Dialog').dialog('option','width','auto').dialog('open');
+                         }
+
+                     );    
+	}
+	
+	////------------------------------END BULK ADDING---------------------------------
+	
 	for (let i = 0; i < allItems.length; i++){
 	if (allItems[i].querySelectorAll("[name=Create]").length > 0){
 		allItems[i].querySelectorAll("[name=Create]")[0].outerHTML = allItems[i].querySelectorAll("[name=Create]")[0].outerHTML;
@@ -914,6 +1636,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 			window.scrollTo(0, 0);
 			document.body.style.overflowX = "hidden";
 			document.body.style.overflowY = "hidden";
+			document.getElementById("SerialNumberPastingBox").select();
 		};
 		
 		closeBulkWindow = function(){
@@ -949,58 +1672,73 @@ if (window.location.href.toLowerCase().includes("microserve")){
 							totalMatches += 1;
 						}
 					}
-					HTMLtimeToTimeout = 15000 + (totalMatches * 2500);
+					HTMLtimeToTimeout = 0000 + (totalMatches * 500);
 					document.getElementById("bulkControlsBlocker").style.display = "block";
 					document.getElementById("bulkRcvButton").innerText = "Please wait...";
 					document.body.style.cursor='progress';
 					resultsFromBulkRcving = bulkReceive(convertedSerialsText, convertedModelsText);
-					setTimeout(function () {
-						backupBulkResultsHTML = `<div style="  height: 100vh;  width: 100vw;  position: absolute;  top: 0;  left: 0;  background-color: #0000002b;  ">    <div id="ActualBulkWindow" style="    width: 75vw;    height: 75vh;    margin-top: 12vh;    margin-left: 12vw;    background-color: #ffffff;    padding: 0.5vw;    "><span class="Title">Bulk Receive</span><button style="float:right" class="Title" onclick="closeBulkWindow()">X</button><br><br><br><span style="margin-left: 10%;">Completed Serials:</span><span style="margin-left: 15%;">Errors:</span><span style="margin-left: 20%;">Remaining:</span><span style="margin-left: 15%;">Remaining Models:</span><br><textarea readonly="" style="width:20%;margin-left: 5%;" rows="30" id="CompletedSerialsCopying" class=""></textarea><textarea readonly="" style="width:20%;margin-left: 2%;" rows="30" id="ErroredSerialsCopying" class=""></textarea><textarea readonly="" style="width:20%;margin-left: 2%;" rows="30" id="RemainingSerialsCopying" class=""></textarea><textarea readonly="" style="width:20%;margin-left: 2%;" rows="30" id="RemainingModelsCopying" class=""></textarea></div></div>`;
-						document.getElementById("OuterBulkWindowDiv").innerHTML = backupBulkResultsHTML;
-						document.getElementById("CompletedSerialsCopying").value = "The following serial numbers have been RECEIVED\n\n";
-						document.getElementById("ErroredSerialsCopying").value = "These serial numbers may not have been received. Please check manually.\n\n";
-						document.getElementById("RemainingSerialsCopying").value = "These serials are in another Shiplink\n\n";
-						document.getElementById("RemainingModelsCopying").value = "Model numbers for the remaining serials\n\n";
-						for (let i = 0; i < todoList.length; i++){
-							if (resultsFromBulkRcving[4][i] != "SKIPTHISONE"){
-								if (allItems[i].querySelectorAll('.ItemProperties:not(.Confirmed):not(.Done)').length > 0){
-									if (resultsFromBulkRcving[1].includes(resultsFromBulkRcving[4][i])){}
-									else{ resultsFromBulkRcving[1].push(resultsFromBulkRcving[4][i]); }
-								}
-								else{
-									resultsFromBulkRcving[0].push(resultsFromBulkRcving[4][i]);
-								}
-							}
-						}
-						if (resultsFromBulkRcving[0].length == 0){
-							document.getElementById("CompletedSerialsCopying").value = "Nothing was received";
-						}
-						if (resultsFromBulkRcving[1].length == 0){
-							document.getElementById("ErroredSerialsCopying").value = "No errors";
-						}
-						if (resultsFromBulkRcving[2].length == 0){
-							document.getElementById("RemainingSerialsCopying").value = "No serials remaining";
-							document.getElementById("RemainingModelsCopying").value = "";
-						}
-						document.body.style.cursor='auto';
-						for (let i = 0; i < resultsFromBulkRcving[0].length; i++){
-							document.getElementById("CompletedSerialsCopying").value = document.getElementById("CompletedSerialsCopying").value + resultsFromBulkRcving[0][i] + '\n';
-						}
-						for (let i = 0; i < resultsFromBulkRcving[1].length; i++){
-							document.getElementById("ErroredSerialsCopying").value = document.getElementById("ErroredSerialsCopying").value + resultsFromBulkRcving[1][i] + '\n';
-						}
-						for (let i = 0; i < resultsFromBulkRcving[2].length; i++){
-							document.getElementById("RemainingSerialsCopying").value = document.getElementById("RemainingSerialsCopying").value + resultsFromBulkRcving[2][i] + '\n';
-						}
-						for (let i = 0; i < resultsFromBulkRcving[3].length; i++){
-							document.getElementById("RemainingModelsCopying").value = document.getElementById("RemainingModelsCopying").value + resultsFromBulkRcving[3][i] + '\n';
-						}
-					}, HTMLtimeToTimeout);
+					setTimeout(function(){ waitforReceiving(totalMatches); }, HTMLtimeToTimeout);
 				}
 				else{
 					alert("Amount of serials does not match amount of models. Please check again.");
 				}
 			}
+		};
+		
+		waitforReceiving = function(itemsLength){
+			if (currentRcvAttemptCount >= itemsLength){
+				bulkButtonPart2();
+			}
+			else{
+				setTimeout(function () {
+					waitforReceiving(itemsLength);
+				}, 5000);
+			}
+		};
+		
+		bulkButtonPart2 = function () {
+			backupBulkResultsHTML = `<div style="  height: 100vh;  width: 100vw;  position: absolute;  top: 0;  left: 0;  background-color: #0000002b;  ">    <div id="ActualBulkWindow" style="    width: 75vw;    height: 75vh;    margin-top: 12vh;    margin-left: 12vw;    background-color: #ffffff;    padding: 0.5vw;    "><span class="Title">Bulk Receive</span><button style="float:right" class="Title" onclick="closeBulkWindow()">X</button><br><br><br><span style="margin-left: 10%;">Completed Serials:</span><span style="margin-left: 15%;">Errors:</span><span style="margin-left: 20%;">Remaining:</span><span style="margin-left: 15%;">Remaining Models:</span><br><textarea readonly="" style="width:20%;margin-left: 5%;" rows="30" id="CompletedSerialsCopying" class=""></textarea><textarea readonly="" style="width:20%;margin-left: 2%;" rows="30" id="ErroredSerialsCopying" class=""></textarea><textarea readonly="" style="width:20%;margin-left: 2%;" rows="30" id="RemainingSerialsCopying" class=""></textarea><textarea readonly="" style="width:20%;margin-left: 2%;" rows="30" id="RemainingModelsCopying" class=""></textarea></div></div>`;
+			document.getElementById("OuterBulkWindowDiv").innerHTML = backupBulkResultsHTML;
+			document.getElementById("CompletedSerialsCopying").value = "The following serial numbers have been RECEIVED\n\n";
+			document.getElementById("ErroredSerialsCopying").value = "These serial numbers may not have been received. Please check manually.\n\n";
+			document.getElementById("RemainingSerialsCopying").value = "These serials are in another Shiplink\n\n";
+			document.getElementById("RemainingModelsCopying").value = "Model numbers for the remaining serials\n\n";
+			for (let i = 0; i < todoList.length; i++){
+				if (resultsFromBulkRcving[4][i] != "SKIPTHISONE"){
+					if (allItems[i].querySelectorAll('.ItemProperties:not(.Confirmed):not(.Done)').length > 0){
+						if (resultsFromBulkRcving[1].includes(resultsFromBulkRcving[4][i])){}
+						else{ resultsFromBulkRcving[1].push(resultsFromBulkRcving[4][i]); }
+					}
+					else{
+						resultsFromBulkRcving[0].push(resultsFromBulkRcving[4][i]);
+					}
+				}
+			}
+			if (resultsFromBulkRcving[0].length == 0){
+				document.getElementById("CompletedSerialsCopying").value = "Nothing was received";
+			}
+			if (resultsFromBulkRcving[1].length == 0){
+				document.getElementById("ErroredSerialsCopying").value = "No errors";
+			}
+			if (resultsFromBulkRcving[2].length == 0){
+				document.getElementById("RemainingSerialsCopying").value = "No serials remaining";
+				document.getElementById("RemainingModelsCopying").value = "";
+			}
+			document.body.style.cursor='auto';
+			for (let i = 0; i < resultsFromBulkRcving[0].length; i++){
+				document.getElementById("CompletedSerialsCopying").value = document.getElementById("CompletedSerialsCopying").value + resultsFromBulkRcving[0][i] + '\n';
+			}
+			for (let i = 0; i < resultsFromBulkRcving[1].length; i++){
+				document.getElementById("ErroredSerialsCopying").value = document.getElementById("ErroredSerialsCopying").value + resultsFromBulkRcving[1][i] + '\n';
+			}
+			for (let i = 0; i < resultsFromBulkRcving[2].length; i++){
+				document.getElementById("RemainingSerialsCopying").value = document.getElementById("RemainingSerialsCopying").value + resultsFromBulkRcving[2][i] + '\n';
+			}
+			for (let i = 0; i < resultsFromBulkRcving[3].length; i++){
+				document.getElementById("RemainingModelsCopying").value = document.getElementById("RemainingModelsCopying").value + resultsFromBulkRcving[3][i] + '\n';
+			}
+			currentRcvAttemptCount = 0;
+			erroredList = [];
 		};
 		
 		guessMake = function (itemIndex){
@@ -1142,6 +1880,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 		
 		bulkReceive = function (serialsList, modelsList){
 			callingBulkRN = true;
+			currentRcvAttemptCount = 0;
 			
 			todoList = [];
 			todoModels = [];
@@ -1178,13 +1917,13 @@ if (window.location.href.toLowerCase().includes("microserve")){
 					if (todoList[i] != "SKIPTHISONE"){
 						if (allItems[i].querySelectorAll('.ItemProperties:not(.Confirmed):not(.Done)').length > 0){
 							allItems[i].querySelectorAll("[name=Make]")[0].value = guessMake(i);
-							if (allItems[i].querySelectorAll("[name=Make]")[0].value == '1.UNDEFINED'){
+							if (allItems[i].querySelectorAll("[name=Make]")[0].value == '1.UNDEFINED' || allItems[i].querySelectorAll("[name=Make]")[0].value == ''){
 								allItems[i].querySelectorAll("[name=Make]")[0].value = guessMakeUnknown(i, todoModels[i]);
 							}
 							allItems[i].querySelectorAll("[name=Make]")[0].dispatchEvent(e);
-							if (allItems[i].querySelectorAll("[name=Make]")[0].value != '1.UNDEFINED'){
+							if (allItems[i].querySelectorAll("[name=Make]")[0].value != '1.UNDEFINED' && allItems[i].querySelectorAll("[name=Make]")[0].value != ''){
 								allItems[i].querySelectorAll("[name=Model]")[0].value = guessModel(i, todoModels[i]);
-								if (allItems[i].querySelectorAll("[name=Model]")[0].value != '1.UNDEFINED'){
+								if (allItems[i].querySelectorAll("[name=Model]")[0].value != '1.UNDEFINED' && allItems[i].querySelectorAll("[name=Model]")[0].value != ''){
 									allItems[i].querySelectorAll("[name=Serial]")[0].value = allItems[i].querySelectorAll("[name=OldSerial]")[0].innerHTML.replace("-", "").replace("o", "0").replace("O", "0").toUpperCase();
 									allItems[i].querySelectorAll('[name="AssetTag"]')[0].value = allItems[i].querySelectorAll('[name="OldAssetTag"]')[0].innerText;
 									if (allItems[i].querySelectorAll('[name="Media"]').length > 0){
@@ -1194,10 +1933,12 @@ if (window.location.href.toLowerCase().includes("microserve")){
 								}
 								else{
 									erroredList.push(allSerials[i]);
+									currentRcvAttemptCount++;
 								}
 							}
 							else{
 								erroredList.push(allSerials[i]);
+								currentRcvAttemptCount++;
 								allItems[i].querySelectorAll("[name=Model]")[0].value = '1.UNDEFINED';
 							}
 						}
@@ -1293,14 +2034,22 @@ if (window.location.href.toLowerCase().includes("microserve")){
 			}
 			var serial = form[0].Serial.value;
 			var model = form[0].Model.value;
-			$.getJSON('/Flowlink/Burnaby/Ajax/AjaxGateway.php?Screen=Incoming&Action=CheckSerial',
+			$.getJSON('/Flowlink/' + cityforFlowlink + '/Ajax/AjaxGateway.php?Screen=Incoming&Action=CheckSerial',
 				{
 					Serial: serial,
 					Model: model
 				},
 				function(data){
-					if (data.Result == 'FatalError'){return data.Result;}
-					else if (data.Result == "Local Asset"){return data.Result;}
+					if (data.Result == 'FatalError'){
+						erroredList.push(serial);
+						currentRcvAttemptCount++;
+						return data.Result;
+					}
+					else if (data.Result == "Local Asset"){
+						erroredList.push(serial);
+						currentRcvAttemptCount++;
+						return data.Result;
+					}
 					else if (data.Result == "Found Asset"){
 						CallJSONMethodNODIALOG('Incoming','ProcessReturn',{assetId: data.Id, tableId: form[0].RelationId.value}, [form[0].querySelectorAll("[name=myItemID]")[0].value, "purple"]);
 					}
@@ -1329,7 +2078,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 			}
 			var serial = form[0].Serial.value;
 			var model = form[0].Model.value;
-			$.getJSON('/Flowlink/Burnaby/Ajax/AjaxGateway.php?Screen=Incoming&Action=CheckSerial',
+			$.getJSON('/Flowlink/' + cityforFlowlink + '/Ajax/AjaxGateway.php?Screen=Incoming&Action=CheckSerial',
 				{
 					Serial: serial,
 					Model: model
@@ -1440,4 +2189,6 @@ if (window.location.href.toLowerCase().includes("microserve")){
 	}
 	}
 	
+	}
+//-------------------------------------------------------------------------------------------------------------------------
 }
