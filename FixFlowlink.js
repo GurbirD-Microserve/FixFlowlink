@@ -418,6 +418,9 @@ if (window.location.href.toLowerCase().includes("microserve")){
 		else if (window.location.href.toLowerCase().includes("victoria")){
 			cityforFlowlink = 'Victoria';
 		}
+		else if (window.location.href.toLowerCase().includes("edmonton")){
+			cityforFlowlink = 'Edmonton';
+		}
 
 	if (window.location.search == "?Screen=Quarantine" && cityforFlowlink == 'Burnaby'){ //Quarantine page
 	    if (document.body.style.backgroundColor != 'rgb(254, 254, 254)'){ 
