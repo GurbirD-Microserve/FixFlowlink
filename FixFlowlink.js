@@ -1,5 +1,7 @@
 if (window.location.href.toLowerCase().includes("microserve")){
 	
+	
+	
 //------------SHIPLINK-----------------------------------------------------------------------------------------------------
 	if (window.location.search.includes("?cmd=shiplink&action=Receive&id=")){
 		if (document.body.style.backgroundColor != 'rgb(254, 254, 254)'){ 
@@ -421,6 +423,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 		else if (window.location.href.toLowerCase().includes("edmonton")){
 			cityforFlowlink = 'Edmonton';
 		}
+		
 
 	if (window.location.search == "?Screen=Quarantine" && cityforFlowlink == 'Burnaby'){ //Quarantine page
 	    if (document.body.style.backgroundColor != 'rgb(254, 254, 254)'){ 
@@ -498,6 +501,10 @@ if (window.location.href.toLowerCase().includes("microserve")){
 				closeOptionsWindow();
 			}
 		});
+		changeHeight = false;
+		if (document.body.scrollHeight < window.innerHeight){
+			changeHeight = true;
+		}
 
 		//FUNCTIONS
 		deleteFromTable = function (shiplinkToRemove){
@@ -632,6 +639,9 @@ if (window.location.href.toLowerCase().includes("microserve")){
 		};
 
 		openOptionsWindow = function (){
+			if (changeHeight){
+				document.body.style.height = '100vh';
+			}
 			backupOptionsWindowHTML = `<div style="
 			  height: 100vh;
 			  width: 100vw;
@@ -671,7 +681,12 @@ if (window.location.href.toLowerCase().includes("microserve")){
 			document.getElementById("OuterOptionsWindowDiv").style.display = "none";
 			document.body.style.overflowX = "scroll";
 			document.body.style.overflowY = "scroll";
-			window.scrollTo(0, document.body.scrollHeight);
+			if (changeHeight){
+				window.scrollTo(0, 0);
+			}
+			else{
+				window.scrollTo(0, document.body.scrollHeight);
+			}
 		};
 
 		//Refresh table with new tab clicks
