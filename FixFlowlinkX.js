@@ -203,6 +203,12 @@ if (window.location.href.toLowerCase().includes("microserve")){
 							if (currentTypeTest == 'Monitor-Tracked' && tempAddingList[i].toUpperCase().includes('L')){
 								currentTypeTest = 'Leased Monitor';
 							}
+							else if (currentTypeTest == 'Desktop' && tempAddingList[i].toUpperCase().includes('B')){
+								currentTypeTest = 'Leased Desktop Bundle';
+							}
+							else if (currentTypeTest == 'Laptop' && tempAddingList[i].toUpperCase().includes('B')){
+								currentTypeTest = 'Leased Laptop Bundle';
+							}
 							if (currentTypeTest == ''){
 								currentAddErrorList.push(addinglistSerials[addinglistTypes.length]);
 								addinglistTypes.push('SKIPTHISSERIALOK');
