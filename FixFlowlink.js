@@ -1,7 +1,5 @@
 if (window.location.href.toLowerCase().includes("microserve")){
 	
-	
-	
 //------------SHIPLINK-----------------------------------------------------------------------------------------------------
 	if (window.location.search.includes("?cmd=shiplink&action=Receive&id=")){
 		if (document.body.style.backgroundColor != 'rgb(254, 254, 254)'){ 
@@ -424,6 +422,10 @@ if (window.location.href.toLowerCase().includes("microserve")){
 			cityforFlowlink = 'Edmonton';
 		}
 		
+	if (cityforFlowlink == ''){
+		console.log("Couldn't get city");
+	}
+	else{
 
 	if (window.location.search == "?Screen=Quarantine" && cityforFlowlink == 'Burnaby'){ //Quarantine page
 	    if (document.body.style.backgroundColor != 'rgb(254, 254, 254)'){ 
@@ -2206,13 +2208,11 @@ if (window.location.href.toLowerCase().includes("microserve")){
 		document.getElementById("BulkReceive").addEventListener("click", openBulkWindow);
 	
 	}
-	else{
+	else{ //No unreceived items
 		document.getElementById("AddMedia").insertAdjacentHTML('afterend', '<input type="button" value="List Devices" id="ListDevices">');
 		document.getElementById("ListDevices").addEventListener("click", openListWindow);
 	}
-	}
-	}
-	
+	}	}	}
 	}
 //-------------------------------------------------------------------------------------------------------------------------
 }
