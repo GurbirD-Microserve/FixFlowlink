@@ -279,12 +279,18 @@ if (window.location.href.toLowerCase().includes("microserve")){
 				tempAddingList = document.getElementById("boxforWorkorders").value.replace(/^\n|\n$/g, '').split("\n");
 				for (let i = 0; i < tempAddingList.length; i++){
 					if (tempAddingList[i].trim('') != ''){
-						if (tempAddingList[i].trim('').trim('"').toLowerCase().includes('blank')){
+						if (tempAddingList[i].trim('').toLowerCase().includes('blank')){
 							addinglistWorkorders.push('');
 						}
 						else{
 							addinglistWorkorders.push(tempAddingList[i].trim(''));
 						}
+					}
+				}
+				if (document.getElementById("boxforWorkorders").value.replace(/\s/g, '').toLowerCase() == 'blank' || document.getElementById("boxforWorkorders").value.replace(/\s/g, '').toLowerCase() == '"blank"'){
+					addinglistWorkorders = [];
+					for (let i = 0; i < addinglistSerials.length; i++){
+						addinglistWorkorders.push('');
 					}
 				}
 				if (addinglistWorkorders.length != addinglistSerials.length){
@@ -304,6 +310,12 @@ if (window.location.href.toLowerCase().includes("microserve")){
 						else{
 							addinglistNotes.push(tempAddingList[i].trim(''));
 						}
+					}
+				}
+				if (document.getElementById("boxforNotes").value.replace(/\s/g, '').toLowerCase() == 'blank' || document.getElementById("boxforNotes").value.replace(/\s/g, '').toLowerCase() == '"blank"'){
+					addinglistNotes = [];
+					for (let i = 0; i < addinglistSerials.length; i++){
+						addinglistNotes.push('');
 					}
 				}
 				if (addinglistNotes.length != addinglistSerials.length){
