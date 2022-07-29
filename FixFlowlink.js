@@ -1952,6 +1952,11 @@ if (window.location.href.toLowerCase().includes("microserve")){
 							allItems[i].querySelectorAll("[name=Make]")[0].dispatchEvent(e);
 							if (allItems[i].querySelectorAll("[name=Make]")[0].value != '1.UNDEFINED' && allItems[i].querySelectorAll("[name=Make]")[0].value != ''){
 								allItems[i].querySelectorAll("[name=Model]")[0].value = guessModel(i, todoModels[i]);
+								if (allItems[i].querySelectorAll("[name=Model]")[0].value == '1.UNDEFINED'){
+									allItems[i].querySelectorAll("[name=Make]")[0].value = guessMakeUnknown(i, todoModels[i]);
+									allItems[i].querySelectorAll("[name=Make]")[0].dispatchEvent(e);
+									allItems[i].querySelectorAll("[name=Model]")[0].value = guessModel(i, todoModels[i]);
+								}
 								if (allItems[i].querySelectorAll("[name=Model]")[0].value != '1.UNDEFINED' && allItems[i].querySelectorAll("[name=Model]")[0].value != ''){
 									allItems[i].querySelectorAll("[name=Serial]")[0].value = allItems[i].querySelectorAll("[name=OldSerial]")[0].innerHTML.replace("-", "").replace("o", "0").replace("O", "0").toUpperCase();
 									allItems[i].querySelectorAll('[name="AssetTag"]')[0].value = allItems[i].querySelectorAll('[name="OldAssetTag"]')[0].innerText;
@@ -1961,6 +1966,8 @@ if (window.location.href.toLowerCase().includes("microserve")){
 									allItems[i].querySelectorAll('[name="Create"]')[0].dispatchEvent(fireReceiveEvent);
 								}
 								else{
+									allItems[i].querySelectorAll("[name=Make]")[0].value = guessMake(i);
+									allItems[i].querySelectorAll("[name=Make]")[0].dispatchEvent(e);
 									erroredList.push(allSerials[i]);
 									currentRcvAttemptCount++;
 								}
