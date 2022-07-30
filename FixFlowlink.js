@@ -1952,7 +1952,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 							allItems[i].querySelectorAll("[name=Make]")[0].dispatchEvent(e);
 							if (allItems[i].querySelectorAll("[name=Make]")[0].value != '1.UNDEFINED' && allItems[i].querySelectorAll("[name=Make]")[0].value != ''){
 								allItems[i].querySelectorAll("[name=Model]")[0].value = guessModel(i, todoModels[i]);
-								if (allItems[i].querySelectorAll("[name=Model]")[0].value == '1.UNDEFINED'){
+								if (allItems[i].querySelectorAll("[name=Model]")[0].value == '1.UNDEFINED' || allItems[i].querySelectorAll("[name=Model]")[0].value == ''){
 									allItems[i].querySelectorAll("[name=Make]")[0].value = guessMakeUnknown(i, todoModels[i]);
 									allItems[i].querySelectorAll("[name=Make]")[0].dispatchEvent(e);
 									allItems[i].querySelectorAll("[name=Model]")[0].value = guessModel(i, todoModels[i]);
@@ -1988,11 +1988,11 @@ if (window.location.href.toLowerCase().includes("microserve")){
 		
 		doAutoFill = function (itemIndex){
 			allItems[itemIndex].querySelectorAll("[name=Make]")[0].value = guessMake(itemIndex);
-			if (allItems[itemIndex].querySelectorAll("[name=Make]")[0].value == '1.UNDEFINED'){
+			if (allItems[itemIndex].querySelectorAll("[name=Make]")[0].value == '1.UNDEFINED' || allItems[itemIndex].querySelectorAll("[name=Make]")[0].value == ''){
 				allItems[itemIndex].querySelectorAll("[name=Make]")[0].value = guessMakeUnknown(itemIndex);
 			}
 			allItems[itemIndex].querySelectorAll("[name=Make]")[0].dispatchEvent(e);
-			if (allItems[itemIndex].querySelectorAll("[name=Make]")[0].value != '1.UNDEFINED'){
+			if (allItems[itemIndex].querySelectorAll("[name=Make]")[0].value != '1.UNDEFINED' || allItems[itemIndex].querySelectorAll("[name=Make]")[0].value != ''){
 				allItems[itemIndex].querySelectorAll("[name=Model]")[0].value = guessModel(itemIndex);
 			}
 			allItems[itemIndex].querySelectorAll("[name=Serial]")[0].value = allItems[itemIndex].querySelectorAll("[name=OldSerial]")[0].innerHTML.replace("-", "").replace("o", "0").replace("O", "0").toUpperCase();
