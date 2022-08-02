@@ -1,6 +1,6 @@
 if (window.location.href.toLowerCase().includes("microserve")){
 	
-	if (window.location.includes("shiplink.microserve.ca") && document.getElementById("extensionAlert") == null){
+	if (window.location.href.includes("shiplink.microserve.ca") && document.getElementById("extensionAlert") == null){
 		document.body.insertAdjacentHTML("afterbegin", `<div id="extensionAlert" style="
 		    background-color: gold;
 		    height: 8vh;
