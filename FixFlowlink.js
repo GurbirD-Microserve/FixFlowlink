@@ -1,5 +1,17 @@
 if (window.location.href.toLowerCase().includes("microserve")){
 	
+	if (window.location.includes("shiplink.microserve.ca") && document.getElementById("extensionAlert") == null){
+		document.body.insertAdjacentHTML("afterbegin", `<div id="extensionAlert" style="
+		    background-color: gold;
+		    height: 8vh;
+		"><span style="
+		    display: table;
+		    margin: auto;
+		    font-size: medium;
+		    padding-top: 2.5vh;
+		">You are using an outdated version of the Flowlink extension. Please download the latest version <a href="https://chrome.google.com/webstore/detail/fixflowlink/ccikheenpoompkbpdpolaobjgflgejhc" target="_blank">from the Chrome Webstore</a></span></div>`);
+	}
+	
 //------------SHIPLINK-----------------------------------------------------------------------------------------------------
 	if (window.location.search.includes("?cmd=shiplink&action=Receive&id=")){
 		if (document.body.style.backgroundColor != 'rgb(254, 254, 254)'){ 
