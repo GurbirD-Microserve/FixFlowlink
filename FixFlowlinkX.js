@@ -1,5 +1,17 @@
 if (window.location.href.toLowerCase().includes("microserve")){
 	
+	if (window.location.href.includes("shiplink.microserve.ca") && document.getElementById("extensionAlert") == null){
+		document.body.insertAdjacentHTML("afterbegin", `<div id="extensionAlert" style="
+		    background-color: gold;
+		    height: 8vh;
+		"><span style="
+		    display: table;
+		    margin: auto;
+		    font-size: medium;
+		    padding-top: 2.5vh;
+		">You are using an outdated version of the Flowlink extension. Please download the latest version <a href="https://chrome.google.com/webstore/detail/fixflowlink/ccikheenpoompkbpdpolaobjgflgejhc" target="_blank">from the Chrome Webstore</a></span></div>`);
+	}
+	
 //------------SHIPLINK-----------------------------------------------------------------------------------------------------
 	if (window.location.search.includes("?cmd=shiplink&action=Receive&id=")){
 		if (document.body.style.backgroundColor != 'rgb(254, 254, 254)'){ 
@@ -279,12 +291,18 @@ if (window.location.href.toLowerCase().includes("microserve")){
 				tempAddingList = document.getElementById("boxforWorkorders").value.replace(/^\n|\n$/g, '').split("\n");
 				for (let i = 0; i < tempAddingList.length; i++){
 					if (tempAddingList[i].trim('') != ''){
-						if (tempAddingList[i].trim('').trim('"').toLowerCase().includes('blank')){
+						if (tempAddingList[i].trim('').toLowerCase().includes('blank')){
 							addinglistWorkorders.push('');
 						}
 						else{
 							addinglistWorkorders.push(tempAddingList[i].trim(''));
 						}
+					}
+				}
+				if (document.getElementById("boxforWorkorders").value.replace(/\s/g, '').toLowerCase() == 'blank' || document.getElementById("boxforWorkorders").value.replace(/\s/g, '').toLowerCase() == '"blank"' || document.getElementById("boxforWorkorders").value.replace(/\s/g, '').toLowerCase() == ''){
+					addinglistWorkorders = [];
+					for (let i = 0; i < addinglistSerials.length; i++){
+						addinglistWorkorders.push('');
 					}
 				}
 				if (addinglistWorkorders.length != addinglistSerials.length){
@@ -304,6 +322,12 @@ if (window.location.href.toLowerCase().includes("microserve")){
 						else{
 							addinglistNotes.push(tempAddingList[i].trim(''));
 						}
+					}
+				}
+				if (document.getElementById("boxforNotes").value.replace(/\s/g, '').toLowerCase() == 'blank' || document.getElementById("boxforNotes").value.replace(/\s/g, '').toLowerCase() == '"blank"' || document.getElementById("boxforNotes").value.replace(/\s/g, '').toLowerCase() == ''){
+					addinglistNotes = [];
+					for (let i = 0; i < addinglistSerials.length; i++){
+						addinglistNotes.push('');
 					}
 				}
 				if (addinglistNotes.length != addinglistSerials.length){
@@ -378,8 +402,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 					data: 'ShiplinkID=' + $('#ShiplinkID')[0].value + '&ProductType=' + ItemDetailsList[0] + '&Make=' + ItemDetailsList[1] + '&Model=' + ItemDetailsList[2] + '&Serial=' + ItemDetailsList[3] + '&ClientNum=' + ItemDetailsList[4] + '&Workorder=' + ItemDetailsList[5] + '&Notes=' + ItemDetailsList[6], 
 					success: function(result)
 					{
-						// If there was no error,
-						// update the product table.
+						// If there was no error, update the product table.
 						if (result.indexOf('Error') == -1)
 						{                              
 							$.get('/Shiplink/Ajax/ShiplinkProductsTable.php', 'DeleteButton=true&ShiplinkID=' + $('#ShiplinkID')[0].value , function(data)
@@ -418,6 +441,14 @@ if (window.location.href.toLowerCase().includes("microserve")){
 		else if (window.location.href.toLowerCase().includes("victoria")){
 			cityforFlowlink = 'Victoria';
 		}
+		else if (window.location.href.toLowerCase().includes("edmonton")){
+			cityforFlowlink = 'Edmonton';
+		}
+		
+	if (cityforFlowlink == ''){
+		console.log("Couldn't get city");
+	}
+	else{
 
 	if (window.location.search == "?Screen=Quarantine" && cityforFlowlink == 'Burnaby'){ //Quarantine page
 	    if (document.body.style.backgroundColor != 'rgb(254, 254, 254)'){ 
@@ -495,6 +526,10 @@ if (window.location.href.toLowerCase().includes("microserve")){
 				closeOptionsWindow();
 			}
 		});
+		changeHeight = false;
+		if (document.body.scrollHeight < window.innerHeight){
+			changeHeight = true;
+		}
 
 		//FUNCTIONS
 		deleteFromTable = function (shiplinkToRemove){
@@ -563,6 +598,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 						if (result == "Done!"){
 							var newRow = myTable.insertRow(-1);
 							newRow.outerHTML = `<tr class="Highlight"><td class="Highlight" onclick="window.open('http://shiplink.microserve.ca/Flowlink/` + cityforFlowlink + `//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + convertedImpText[i] + `','_blank')">` + convertedImpText[i] + `</td><td class="Highlight" onclick=" window.open('http://shiplink.microserve.ca/Flowlink/` + cityforFlowlink + `//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + convertedImpText[i] + `','_blank')"></td><td class="Highlight" onclick=" window.open('http://shiplink.microserve.ca/Flowlink/` + cityforFlowlink + `//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + convertedImpText[i] + `','_blank')"></td><td class="Highlight" onclick=" window.open('http://shiplink.microserve.ca/Flowlink/` + cityforFlowlink + `//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + convertedImpText[i] + `','_blank')"></td><td class="Highlight" onclick=" window.open('http://shiplink.microserve.ca/Flowlink/` + cityforFlowlink + `//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + convertedImpText[i] + `','_blank')"></td><td class="Highlight" onclick=" window.open('http://shiplink.microserve.ca/Flowlink/` + cityforFlowlink + `//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + convertedImpText[i] + `','_blank')"></td><td class="Highlight" onclick=" window.open('http://shiplink.microserve.ca/Flowlink/` + cityforFlowlink + `//Index.php?Screen=Incoming&Action=Shiplink&Project=TRP&id=` + convertedImpText[i] + `','_blank')"></td><td class="Highlight">` + `<a name="Hide" shiplinkid="` + convertedImpText[i] + `" href="#" style="display: none;" onclick="return false;">Hide</a>` + `</td></tr>`;
+							window.scrollTo(0, document.body.scrollHeight);
 							document.getElementById('OuterOptionsWindowDiv').style.setProperty("top", (document.body.scrollHeight - window.innerHeight) + 'px');
 							allShiplinksList.push(convertedImpText[i]);
 							$('a[name="Hide"]').click(function(){
@@ -582,6 +618,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 				   });
 				}
 				document.getElementById("blkImp").value = '';
+				window.scrollTo(0, document.body.scrollHeight);
 			}
 		};
 
@@ -629,6 +666,9 @@ if (window.location.href.toLowerCase().includes("microserve")){
 		};
 
 		openOptionsWindow = function (){
+			if (changeHeight){
+				document.body.style.height = '100vh';
+			}
 			backupOptionsWindowHTML = `<div style="
 			  height: 100vh;
 			  width: 100vw;
@@ -668,7 +708,12 @@ if (window.location.href.toLowerCase().includes("microserve")){
 			document.getElementById("OuterOptionsWindowDiv").style.display = "none";
 			document.body.style.overflowX = "scroll";
 			document.body.style.overflowY = "scroll";
-			window.scrollTo(0, document.body.scrollHeight);
+			if (changeHeight){
+				window.scrollTo(0, 0);
+			}
+			else{
+				window.scrollTo(0, document.body.scrollHeight);
+			}
 		};
 
 		//Refresh table with new tab clicks
@@ -781,6 +826,9 @@ if (window.location.href.toLowerCase().includes("microserve")){
 											window.location.reload();
 									   }
 								   }
+							   }
+							   if (method == 'DeleteItem' || method == 'CreatePeripheral' || method == 'ConfirmShiplink'){
+								   window.location.reload();
 							   }
 							}
 						}
@@ -1552,20 +1600,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 		allItems[i].querySelectorAll("[name=DeleteSl]")[0].outerHTML = allItems[i].querySelectorAll("[name=DeleteSl]")[0].outerHTML;
 		allItems[i].querySelectorAll("[name=DeleteSl]")[0].id = "DeleteButton" + i;
 	}
-	if (allItems[i].querySelectorAll("[name=Delete]").length > 0){
-		allItems[i].querySelectorAll("[name=Delete]")[0].outerHTML = allItems[i].querySelectorAll("[name=Delete]")[0].outerHTML;
-		allItems[i].querySelectorAll("[name=Delete]")[0].id = "ConfirmDelete" + i;
 	}
-	}
-	document.getElementById("Confirm").outerHTML = document.getElementById("Confirm").outerHTML;
-	$('#Confirm').click(function(){
-		CallJSONMethod('Incoming','ConfirmShiplink', {ShiplinkID: $('#ShiplinkId').val()}, [0,"refresh"]);
-	});
-
-	$('input[name=Delete]').click(function(){
-		var tableID = $(this).parents('.ItemProperties').children('input[name="tableID"]').val();    
-		CallJSONMethod('Incoming','DeleteItem', {TableId: tableID}, [0,"refresh"]);
-	});
 	
 	if (notReceived.length > 0){ 
 		$('input[name=Delete]').click(function(){
@@ -1636,7 +1671,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 				background-color: #ffffff;
 				padding: 0.5vw;
 				"><span class="Title">Bulk Receive</span><button style="float:right" class="Title" onclick="closeBulkWindow()">X</button><br><br><br><span style="margin-left: 12%;">Paste Serials:</span><span style="float: right; margin-right: 40%;">Paste Model Numbers:</span><br>
-			<textarea style="width:30%;margin-left: 10%;" rows="30" id="SerialNumberPastingBox" class=""></textarea><textarea style="width:30%;float: right; margin-right: 25%;" rows="30" id="ModelNumberPastingBox" class=""></textarea><br><br><br><br><a href="javascript:;" onclick="notFoundAll();">"Not Found" All Items</a><a style="margin-left: 2%;" href="javascript:;" onclick="handleAll40A2s();">Receive all 40A2s</a><button style="float:right" id="bulkRcvButton" onclick="bulkRcvButtonFunction()">Receive All</button></div></div>`;
+			<textarea style="width:30%;margin-left: 10%;" rows="30" id="SerialNumberPastingBox" class=""></textarea><textarea style="width:30%;float: right; margin-right: 25%;" rows="30" id="ModelNumberPastingBox" class=""></textarea><br><br><br><br><a href="javascript:;" onclick="notFoundAll();">"Not Found" All Items</a><a style="margin-left: 2%;" href="javascript:;" onclick="handleAll40A2s();">Receive all 40A2s</a><a style="margin-left: 5px;" href="javascript:;" onclick="handleAll40AJs();">40AJs</a><button style="float:right" id="bulkRcvButton" onclick="bulkRcvButtonFunction()">Receive All</button></div></div>`;
 			document.getElementById("OuterBulkWindowDiv").innerHTML = backupBulkWindowHTML;
 			document.getElementById("OuterBulkWindowDiv").style.display = "block";
 			window.scrollTo(0, 0);
@@ -1929,6 +1964,11 @@ if (window.location.href.toLowerCase().includes("microserve")){
 							allItems[i].querySelectorAll("[name=Make]")[0].dispatchEvent(e);
 							if (allItems[i].querySelectorAll("[name=Make]")[0].value != '1.UNDEFINED' && allItems[i].querySelectorAll("[name=Make]")[0].value != ''){
 								allItems[i].querySelectorAll("[name=Model]")[0].value = guessModel(i, todoModels[i]);
+								if (allItems[i].querySelectorAll("[name=Model]")[0].value == '1.UNDEFINED' || allItems[i].querySelectorAll("[name=Model]")[0].value == ''){
+									allItems[i].querySelectorAll("[name=Make]")[0].value = guessMakeUnknown(i, todoModels[i]);
+									allItems[i].querySelectorAll("[name=Make]")[0].dispatchEvent(e);
+									allItems[i].querySelectorAll("[name=Model]")[0].value = guessModel(i, todoModels[i]);
+								}
 								if (allItems[i].querySelectorAll("[name=Model]")[0].value != '1.UNDEFINED' && allItems[i].querySelectorAll("[name=Model]")[0].value != ''){
 									allItems[i].querySelectorAll("[name=Serial]")[0].value = allItems[i].querySelectorAll("[name=OldSerial]")[0].innerHTML.replace("-", "").replace("o", "0").replace("O", "0").toUpperCase();
 									allItems[i].querySelectorAll('[name="AssetTag"]')[0].value = allItems[i].querySelectorAll('[name="OldAssetTag"]')[0].innerText;
@@ -1938,6 +1978,8 @@ if (window.location.href.toLowerCase().includes("microserve")){
 									allItems[i].querySelectorAll('[name="Create"]')[0].dispatchEvent(fireReceiveEvent);
 								}
 								else{
+									allItems[i].querySelectorAll("[name=Make]")[0].value = guessMake(i);
+									allItems[i].querySelectorAll("[name=Make]")[0].dispatchEvent(e);
 									erroredList.push(allSerials[i]);
 									currentRcvAttemptCount++;
 								}
@@ -1958,11 +2000,11 @@ if (window.location.href.toLowerCase().includes("microserve")){
 		
 		doAutoFill = function (itemIndex){
 			allItems[itemIndex].querySelectorAll("[name=Make]")[0].value = guessMake(itemIndex);
-			if (allItems[itemIndex].querySelectorAll("[name=Make]")[0].value == '1.UNDEFINED'){
+			if (allItems[itemIndex].querySelectorAll("[name=Make]")[0].value == '1.UNDEFINED' || allItems[itemIndex].querySelectorAll("[name=Make]")[0].value == ''){
 				allItems[itemIndex].querySelectorAll("[name=Make]")[0].value = guessMakeUnknown(itemIndex);
 			}
 			allItems[itemIndex].querySelectorAll("[name=Make]")[0].dispatchEvent(e);
-			if (allItems[itemIndex].querySelectorAll("[name=Make]")[0].value != '1.UNDEFINED'){
+			if (allItems[itemIndex].querySelectorAll("[name=Make]")[0].value != '1.UNDEFINED' || allItems[itemIndex].querySelectorAll("[name=Make]")[0].value != ''){
 				allItems[itemIndex].querySelectorAll("[name=Model]")[0].value = guessModel(itemIndex);
 			}
 			allItems[itemIndex].querySelectorAll("[name=Serial]")[0].value = allItems[itemIndex].querySelectorAll("[name=OldSerial]")[0].innerHTML.replace("-", "").replace("o", "0").replace("O", "0").toUpperCase();
@@ -2031,7 +2073,42 @@ if (window.location.href.toLowerCase().includes("microserve")){
 			}
 			else{ alert("No 40A2s."); }
 		};
-		
+		handleAll40AJs = function (){
+			completed40AJs = [];
+			for (let i = 0; i < allItems.length; i++){
+				if (allItems[i].querySelectorAll("[name=OldModel]").length > 0){
+					if (allItems[i].querySelectorAll("[name=OldModel]")[0].innerHTML.toUpperCase() == "40AJ" && allItems[i].querySelectorAll( '.ItemProperties:not(.Confirmed):not(.Done)').length > 0){
+						if (completed40AJs.includes(allSerials[i])){
+							deleting40A2srn = true;
+							allItems[i].querySelectorAll('[name="DeleteSl"]')[0].dispatchEvent(fireReceiveEvent);
+							deleting40A2srn = false;
+						}
+						else{
+							callingBulkRN = true;
+							allItems[i].querySelectorAll('[name="Make"]')[0].value = "Lenovo";
+							allItems[i].querySelectorAll('[name="Make"]')[0].dispatchEvent(e);
+							allItems[i].querySelectorAll('[name="Model"]')[0].value = "40AJ";
+							allItems[i].querySelectorAll('[name="Serial"]')[0].value = allSerials[i];
+							allItems[i].querySelectorAll('[name="AssetTag"]')[0].value = "N/A";
+							allItems[i].querySelectorAll('[name="Media"]')[0].value = "No Media Found";
+							allItems[i].querySelectorAll('[name="Create"]')[0].dispatchEvent(fireReceiveEvent);
+							completed40AJs.push(allSerials[i]);
+							callingBulkRN = false;
+						}
+					}
+				}
+			}
+			if (completed40AJs.length > 0){
+				document.getElementById("bulkControlsBlocker").style.display = "block";
+				document.body.style.cursor='progress';
+				setTimeout(function () {
+					alert("Done");
+					document.getElementById("bulkControlsBlocker").style.display = "none";
+					document.body.style.cursor='auto';
+				}, 5000);
+			}
+			else{ alert("No 40AJs."); }
+		};
 		
 		checkSerialNODIALOG = function (form){
 			if (form[0].Serial == undefined){
@@ -2188,13 +2265,11 @@ if (window.location.href.toLowerCase().includes("microserve")){
 		document.getElementById("BulkReceive").addEventListener("click", openBulkWindow);
 	
 	}
-	else{
+	else{ //No unreceived items
 		document.getElementById("AddMedia").insertAdjacentHTML('afterend', '<input type="button" value="List Devices" id="ListDevices">');
 		document.getElementById("ListDevices").addEventListener("click", openListWindow);
 	}
-	}
-	}
-	
+	}	}	}
 	}
 //-------------------------------------------------------------------------------------------------------------------------
 }
