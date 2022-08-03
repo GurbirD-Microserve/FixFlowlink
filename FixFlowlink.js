@@ -101,7 +101,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 	    window.close();
 	}
 	
-	if (window.location.href.includes("shiplink.microserve.ca"){
+	if (window.location.href.includes("shiplink.microserve.ca")){
 		$(".copyright").each(function(){
 		    if (!$(this).html().includes('gurbir')){
 			$(this).html($(this).html() + ' || gurbird@sfu.ca');
