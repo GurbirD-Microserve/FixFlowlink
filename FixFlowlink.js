@@ -1813,6 +1813,12 @@ if (window.location.href.toLowerCase().includes("microserve")){
 					return allMakes[i];
 				}
 			}
+			givenModelX = allItems[itemIndex].querySelectorAll("[name=OldModel]")[0].innerHTML;
+			for (let i = 0; i < allMakesCaps.length; i++){
+				if (givenModelX.toUpperCase().includes(allMakesCaps[i])){
+					return allMakes[i];
+				}
+			}
 			return '1.UNDEFINED';
 		};
 		
@@ -1826,10 +1832,10 @@ if (window.location.href.toLowerCase().includes("microserve")){
 			if (givenModel.trim('') == ''){
 				return '1.UNDEFINED';
 			}
-			majorMakes = ["Lenovo", "Dell", "HP"];
-			for (let i = 0; i < majorMakes.length; i++){
-				if (givenModel.toUpperCase().includes(majorMakes[i].toUpperCase())){ return majorMakes[i]; }
-			}
+			// majorMakes = ["Lenovo", "Dell", "HP"];
+			// for (let i = 0; i < majorMakes.length; i++){
+				// if (givenModel.toUpperCase().includes(majorMakes[i].toUpperCase())){ return majorMakes[i]; }
+			// }
 			allModels = [];
 			allModelsCaps = [];
 			for (let i = 0; i < allItems[itemIndex].querySelectorAll("[name=Model]")[0].options.length; i++){
