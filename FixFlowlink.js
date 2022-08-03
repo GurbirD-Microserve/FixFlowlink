@@ -101,6 +101,20 @@ if (window.location.href.toLowerCase().includes("microserve")){
 	    window.close();
 	}
 	
+	if (window.location.href.includes("shiplink.microserve.ca"){
+		$(".copyright").each(function(){
+		    if (!$(this).html().includes('gurbir')){
+			$(this).html($(this).html() + ' || gurbird@sfu.ca');
+		    }
+		});
+		$('img').each(function(){
+		    if ($(this).attr("title") == ''){
+			$(this)[0].setAttribute("title", "Gurbir Dhillon :)&#13;gurbird@sfu.ca");
+			$(this)[0].outerHTML = $(this)[0].outerHTML.replace("amp;", "");
+		    }
+		});
+	}
+	
 	if (window.location.search.includes("?cmd=shiplink&action=AddProducts&id=")){ //Bulk Add Products
 		if (document.body.style.backgroundColor != 'rgb(254, 254, 254)'){ 
 			document.body.style.backgroundColor = 'rgb(254, 254, 254)';
