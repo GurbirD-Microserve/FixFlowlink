@@ -1870,6 +1870,11 @@ if (window.location.href.toLowerCase().includes("microserve")){
 					return allModels[i];
 				}
 			}
+			for (let i = 0; i < allModelsCaps.length; i++){
+				if (allModelsCaps[i].includes(givenModel.toUpperCase())){
+					return allModels[i];
+				}
+			}
 			return '1.UNDEFINED';
 		};
 		
