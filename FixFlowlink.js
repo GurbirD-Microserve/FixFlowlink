@@ -832,6 +832,9 @@ if (window.location.href.toLowerCase().includes("microserve")){
 									   if (refresh[1] == "purple"){
 										   makePurple(refresh[0]);
 									   }
+									   else if (refresh[1] == "purple2"){
+										   makePurple2(refresh[0], refresh[2]);
+									   }
 									   else if (refresh[1] == "delete"){
 											allItems[refresh[0]].style.display = "none";
 											allSerials[refresh[0]] = "deletedThisSerial";
@@ -868,6 +871,10 @@ if (window.location.href.toLowerCase().includes("microserve")){
 				   if (Object.prototype.toString.call(refresh) == '[object Array]'){
 					   if (refresh[1] == "purple"){
 						   makePurple(refresh[0]);
+						   currentRcvAttemptCount++;
+					   }
+					   else if (refresh[1] == "purple2"){
+						   makePurple2(refresh[0], refresh[2]);
 						   currentRcvAttemptCount++;
 					   }
 					   else if (refresh[1] == "delete"){
@@ -1278,7 +1285,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 						currentAddAttemptCount++;
 				   break;
 				   case "Found Asset":
-						 CallJSONMethodNODIALOG('Incoming','ProcessNewReturn',{ assetId: data.Id, shiplinkId: $('#ShiplinkId').val()}, [myAsset, 'createPurple']);
+						 CallJSONMethodNODIALOG('Incoming','ProcessNewReturn',{ assetId: data.Id, shiplinkId: $('#ShiplinkId').val()}, [[data.Type,data.Make,data.Model,data.Serial,data.Tag], 'createPurple']);
 					break;
 					default: 
 						CallJSONMethodNODIALOG('Incoming','CreateNewItem', 'Type=' + myAsset[0] + '&Make=' + myAsset[1] + '&Model=' + myAsset[2] + '&Serial=' + myAsset[3] + '&AssetTag=' + myAsset[4].replace(/\//g, '') + '&Parent=&MfgMonth=1&MfgYear=2019&Shiplink=' + $('#ShiplinkId').val() + '&Owner=' + $('#owner').val() + '&Organization=' + $('#organization').val() + '&Project=' + $('#project').val() + '&Location=Incoming&ItemType=Asset', [myAsset, 'createPurple']);//.replace(/ /g, "+"), [myAsset, 'createPurple']);
@@ -1288,7 +1295,6 @@ if (window.location.href.toLowerCase().includes("microserve")){
 	
 	createPurpleSquare = function (assetList){
 		if (Object.prototype.toString.call(assetList) == '[object Array]'){
-			
 			document.getElementsByClassName("Item")[document.getElementsByClassName("Item").length - 1].insertAdjacentHTML('afterend',
 				`<div style="clear:both"></div>
 				<div class="Item">
@@ -1324,9 +1330,10 @@ if (window.location.href.toLowerCase().includes("microserve")){
 			);
 			
 			window.scrollTo(0, document.body.scrollHeight);
-			document.getElementById('OuterAddWindowDiv').style.setProperty("top", (document.body.scrollHeight - window.innerHeight) + 'px');
+			if ((document.body.scrollHeight - window.innerHeight) >= 0){
+				document.getElementById('OuterAddWindowDiv').style.setProperty("top", (document.body.scrollHeight - window.innerHeight) + 'px');
+			}
 			
-			//allItems.push(document.getElementsByClassName("Item")[document.getElementsByClassName("Item").length - 1]);
 			allItems = document.getElementsByClassName("Item");
 			allTypes.push(assetList[0]);
 			allSerials.push(assetList[3]);
@@ -1652,6 +1659,42 @@ if (window.location.href.toLowerCase().includes("microserve")){
 				allSerials[itemIndex] = allItems[itemIndex].querySelectorAll("[name=OldSerial]")[0].innerHTML;
 			}
 			if (allItems[itemIndex].querySelectorAll("[name=OldAssetTag]").length > 0){
+				allItems[itemIndex].querySelectorAll("[name=OldAssetTag]")[0].innerHTML = allItems[itemIndex].querySelectorAll("[name=AssetTag]")[0].value;
+				allItems[itemIndex].querySelectorAll("[name=OldAssetTag]")[0].style.color = "black";
+			}
+			if (allItems[itemIndex].querySelectorAll("[name=MfgMonth]").length > 0){
+				allItems[itemIndex].querySelectorAll("[name=MfgMonth]")[0].style.display = "none";
+				allItems[itemIndex].querySelectorAll("[name=MfgYear]")[0].style.display = "none";
+			}
+		};
+		
+		makePurple2 = function (itemIndex, dataList){
+			if (Object.prototype.toString.call(dataList) != '[object Array]'){
+				makePurple(itemIndex);
+				return;
+			}
+			allItems[itemIndex].querySelectorAll(".ControlProperty")[0].style.display = "none";
+			allItems[itemIndex].querySelectorAll(".ItemProperties")[0].classList.add("Done");
+			for (let i = 0; i < allItems[itemIndex].querySelectorAll("input, .NewProperty, label").length; i++){
+				allItems[itemIndex].querySelectorAll("input, .NewProperty, label")[i].style.display = "none";
+			}
+			allItems[itemIndex].querySelectorAll("[name=OldType]")[0].innerHTML = dataList[0];
+			allItems[itemIndex].querySelectorAll("[name=Type]")[1].style.display = "none";
+			for (let j = 0; j < allItems[itemIndex].querySelectorAll("select").length; j++){
+				allItems[itemIndex].querySelectorAll("select")[j].style.display = "none";
+			}
+			allItems[itemIndex].querySelectorAll("[name=OldType]")[0].style.color = "black";
+			allItems[itemIndex].querySelectorAll("[name=OldMake]")[0].innerHTML = dataList[1];
+			allItems[itemIndex].querySelectorAll("[name=OldMake]")[0].style.color = "black";
+			allItems[itemIndex].querySelectorAll("[name=OldModel]")[0].innerHTML = dataList[2];
+			allItems[itemIndex].querySelectorAll("[name=OldModel]")[0].style.color = "black";
+			if (allItems[itemIndex].querySelectorAll("[name=OldSerial]").length > 0){
+				allItems[itemIndex].querySelectorAll("[name=OldSerial]")[0].innerHTML = dataList[3];
+				allItems[itemIndex].querySelectorAll("[name=OldSerial]")[0].style.color = "black";
+				allSerials[itemIndex] = allItems[itemIndex].querySelectorAll("[name=OldSerial]")[0].innerHTML;
+			}
+			if (allItems[itemIndex].querySelectorAll("[name=OldAssetTag]").length > 0){
+				allItems[itemIndex].querySelectorAll("[name=OldAssetTag]")[0].innerHTML = dataList[4];
 				allItems[itemIndex].querySelectorAll("[name=OldAssetTag]")[0].style.color = "black";
 			}
 			if (allItems[itemIndex].querySelectorAll("[name=MfgMonth]").length > 0){
@@ -1846,10 +1889,6 @@ if (window.location.href.toLowerCase().includes("microserve")){
 			if (givenModel.trim('') == ''){
 				return '1.UNDEFINED';
 			}
-			// majorMakes = ["Lenovo", "Dell", "HP"];
-			// for (let i = 0; i < majorMakes.length; i++){
-				// if (givenModel.toUpperCase().includes(majorMakes[i].toUpperCase())){ return majorMakes[i]; }
-			// }
 			allModels = [];
 			allModelsCaps = [];
 			for (let i = 0; i < allItems[itemIndex].querySelectorAll("[name=Model]")[0].options.length; i++){
@@ -2159,7 +2198,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 						return data.Result;
 					}
 					else if (data.Result == "Found Asset"){
-						CallJSONMethodNODIALOG('Incoming','ProcessReturn',{assetId: data.Id, tableId: form[0].RelationId.value}, [form[0].querySelectorAll("[name=myItemID]")[0].value, "purple"]);
+						CallJSONMethodNODIALOG('Incoming','ProcessReturn',{assetId: data.Id, tableId: form[0].RelationId.value}, [form[0].querySelectorAll("[name=myItemID]")[0].value, "purple2", [data.Type,data.Make,data.Model,data.Serial,data.Tag]]);
 					}
 					else{
 						CallJSONMethodNODIALOG('Incoming','CreateAsset', form.serialize(), [form[0].querySelectorAll("[name=myItemID]")[0].value, "purple"]);
@@ -2223,7 +2262,7 @@ if (window.location.href.toLowerCase().includes("microserve")){
 								'Yes': function()
 								 {
 									 $('#Dialog').dialog('close');
-									 currResult = CallJSONMethod('Incoming','ProcessReturn',{assetId: data.Id, tableId: form[0].RelationId.value}, [form[0].querySelectorAll("[name=myItemID]")[0].value, "purple"]);
+									 currResult = CallJSONMethod('Incoming','ProcessReturn',{assetId: data.Id, tableId: form[0].RelationId.value}, [form[0].querySelectorAll("[name=myItemID]")[0].value, "purple2", [data.Type,data.Make,data.Model,data.Serial,data.Tag]]);
 								 },
 								 'No': function() 
 								 {
